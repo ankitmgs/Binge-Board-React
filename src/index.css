@@ -1,0 +1,11 @@
+html.light, body.light {
+  background-color: #eeefff;
+  color: #222;
+}
+
+html.dark, body.dark {
+  background-color: #191729;
+  color: #f5f5f5;
+}
+
+/* Add your global styles here */
