@@ -5,9 +5,22 @@ import { signOut, auth } from "../services/firebase";
 import { toast } from "react-toastify";
 import { Sun, Moon } from "lucide-react";
 import { onAuthStateChanged } from "../services/firebase";
+import { useSelector, useDispatch } from "react-redux";
+import type { RootState } from "../store";
+import { clearUser } from "../userSlice";
+import { Button } from "../ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { getInitials } from "../helper";
 
 const Header = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const user = useSelector((state: RootState) => state.user) as {
+    uid: string | null;
+    email?: string | null;
+    displayName?: string | null;
+    photoURL?: string | null;
+  };
   const [theme, setTheme] = useState(
     () => localStorage.getItem("theme") || "light"
   );
@@ -29,6 +42,7 @@ const Header = () => {
   const handleLogout = async () => {
     try {
       await signOut(auth);
+      dispatch(clearUser());
       toast.success("Logged out successfully");
       navigate("/login");
     } catch (error) {
@@ -38,6 +52,44 @@ const Header = () => {
 
   const toggleTheme = () => {
     setTheme((prev) => (prev === "light" ? "dark" : "light"));
+  };
+
+  const renderAuthSection = () => {
+    if (user && isAuthenticated) {
+      return (
+        <Link to="/me">
+          <Button
+            variant="ghost"
+            className="relative h-9 w-9 rounded-full p-0 group"
+            aria-label="My Profile and Lists"
+          >
+            <Avatar className="h-9 w-9 border-2 border-primary/30">
+              <AvatarImage
+                src={user.photoURL || undefined}
+                alt={user.displayName || user.email || "User Avatar"}
+                data-ai-hint="user avatar"
+                className="object-cover"
+              />
+              <AvatarFallback email={user.email}>
+                {user.displayName
+                  ? getInitials(user.displayName, user.email)
+                  : null}
+              </AvatarFallback>
+            </Avatar>
+            {/* Responsive Tooltip on hover, shown below avatar */}
+            <div className="absolute left-1/2 top-full z-50 mt-2 min-w-[180px] max-w-[90vw] sm:max-w-xs md:max-w-sm lg:max-w-md xl:max-w-lg -translate-x-1/2 hidden group-hover:flex flex-col items-center bg-white dark:bg-gray-900 text-black dark:text-white text-xs rounded shadow-lg px-3 py-2 whitespace-normal border border-gray-200 dark:border-gray-700 transition-all duration-200 box-border overflow-x-auto">
+              <span className="font-semibold break-words text-center w-full">
+                {user.displayName || "No Name"}
+              </span>
+              <span className="opacity-80 break-words text-center w-full">
+                {user.email || "No Email"}
+              </span>
+            </div>
+          </Button>
+        </Link>
+      );
+    }
+    return null;
   };
 
   return (
@@ -76,14 +128,18 @@ const Header = () => {
             )}
           </button>
           {isAuthenticated && (
-            <button
-              onClick={handleLogout}
-              className={`px-4 py-2 rounded bg-primary hover:bg-primary/80 transition ${
-                theme === "dark" ? "text-white" : "text-black"
-              }`}
-            >
-              Logout
-            </button>
+            <>
+              <button
+                onClick={handleLogout}
+                className={`px-4 py-2 rounded bg-primary hover:bg-primary/80 transition ${
+                  theme === "dark" ? "text-white" : "text-black"
+                }`}
+              >
+                Logout
+              </button>
+              <div>Search</div>
+              <div>{renderAuthSection()}</div>
+            </>
           )}
         </div>
       </header>

@@ -9,11 +9,14 @@ import Login from "./pages/Login";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { onAuthStateChanged, auth } from "./services/firebase";
+import { useDispatch } from "react-redux";
+import { setUser, clearUser } from "./userSlice";
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const location = useLocation();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(
@@ -21,10 +24,20 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
       (user: any) => {
         setIsAuthenticated(!!user);
         setLoading(false);
+        if (user) {
+          dispatch(setUser({
+            uid: user.uid,
+            email: user.email || null,
+            displayName: user.displayName || null,
+            photoURL: user.photoURL || null,
+          }));
+        } else {
+          dispatch(clearUser());
+        }
       }
     );
     return () => unsubscribe();
-  }, []);
+  }, [dispatch]);
 
   if (loading) return null; // or a spinner
   if (!isAuthenticated) return <Navigate to="/login" state={{ from: location }} replace />;

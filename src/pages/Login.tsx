@@ -16,6 +16,8 @@ import {
 } from '../services/firebase';
 import { toast } from 'react-toastify';
 import Google_logo from '../assets/google_logo.svg';
+import { useDispatch } from 'react-redux';
+import { setUser } from '../userSlice';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -25,10 +27,17 @@ export default function LoginPage() {
   const [isSignUp, setIsSignUp] = useState(false); 
   const [showPassword, setShowPassword] = useState(false);
   const router = useNavigate();
+  const dispatch = useDispatch();
 
-  const handleAuthSuccess = (user?: { uid?: string }) => {
+  const handleAuthSuccess = (user?: { uid?: string, email?: string | null, displayName?: string | null, photoURL?: string | null }) => {
     if (user?.uid) {
-      localStorage.setItem('uid', user.uid);
+      dispatch(setUser({
+        uid: user.uid,
+        email: user.email || null,
+        displayName: user.displayName || null,
+        photoURL: user.photoURL || null,
+      }));
+      localStorage.setItem('uid', user.uid); // Optionally remove this if only Redux is desired
     }
     toast.success(isSignUp ? "Account created!" : "Signed in!");
     router('/');
@@ -76,7 +85,12 @@ export default function LoginPage() {
     setIsLoading(true);
     const { user, error: googleError } = await signInWithGoogle();
     if (user) {
-      localStorage.setItem('uid', user.uid);
+      dispatch(setUser({
+        uid: user.uid,
+        email: user.email || null,
+        displayName: user.displayName || null,
+        photoURL: user.photoURL || null,
+      }));
       toast.success("Signed in with Google!");
       router('/');
     } else if (googleError) {
