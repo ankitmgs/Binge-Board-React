@@ -1,10 +1,16 @@
 import React, { useEffect, useState } from "react";
 import "./App.css";
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+} from "react-router-dom";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Profile from "./pages/Profile";
-import Header from "./components/Header";
+import Header from "./components/header/Header";
 import Login from "./pages/Login";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -19,35 +25,36 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(
-      auth,
-      (user: any) => {
-        setIsAuthenticated(!!user);
-        setLoading(false);
-        if (user) {
-          dispatch(setUser({
+    const unsubscribe = onAuthStateChanged(auth, (user: any) => {
+      setIsAuthenticated(!!user);
+      setLoading(false);
+      if (user) {
+        dispatch(
+          setUser({
             uid: user.uid,
             email: user.email || null,
             displayName: user.displayName || null,
             photoURL: user.photoURL || null,
-          }));
-        } else {
-          dispatch(clearUser());
-        }
+          })
+        );
+      } else {
+        dispatch(clearUser());
       }
-    );
+    });
     return () => unsubscribe();
   }, [dispatch]);
 
   if (loading) return null; // or a spinner
-  if (!isAuthenticated) return <Navigate to="/login" state={{ from: location }} replace />;
+  if (!isAuthenticated)
+    return <Navigate to="/login" state={{ from: location }} replace />;
   return <>{children}</>;
 }
 
 function App() {
   return (
     <Router>
-      <nav>
+      <nav
+      >
         <Header />
       </nav>
       <Routes>
@@ -65,7 +72,16 @@ function App() {
           }
         />
       </Routes>
-      <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} newestOnTop closeOnClick pauseOnFocusLoss draggable pauseOnHover />
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </Router>
   );
 }

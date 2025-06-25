@@ -1,4 +1,5 @@
 import { HeroBanner } from "../components/banner/HeroBanner";
+import HomeMoviesSection from "../components/homeMovies";
 
 function Home() {
 
@@ -128,7 +129,7 @@ function Home() {
 
 
   return (
-    <main className="container mx-auto py-6 sm:py-8">
+    <main className="container mx-auto py-6 sm:py-8 mt-[65px]">
       <div className="px-4">
         <h1 className="text-4xl sm:text-5xl font-extrabold mb-6 sm:mb-8 text-center tracking-tight">
           <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-pink-500 to-indigo-600">
@@ -138,6 +139,8 @@ function Home() {
       </div>
 
       <HeroBanner items={item} />
+
+      <HomeMoviesSection />
     </main>
   );
 }

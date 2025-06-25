@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import logo from "../assets/logo.png";
-import { signOut, auth } from "../services/firebase";
+import logo from "../../assets/logo.png";
+import { signOut, auth } from "../../services/firebase";
 import { toast } from "react-toastify";
 import { Sun, Moon } from "lucide-react";
-import { onAuthStateChanged } from "../services/firebase";
+import { onAuthStateChanged } from "../../services/firebase";
 import { useSelector, useDispatch } from "react-redux";
-import type { RootState } from "../store";
-import { clearUser } from "../userSlice";
-import { Button } from "../ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { getInitials } from "../helper";
+import type { RootState } from "../../store";
+import { clearUser } from "../../userSlice";
+import { Button } from "../../ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "../../ui/avatar";
+import { getInitials } from "../../helper";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -77,8 +77,19 @@ const Header = () => {
               </AvatarFallback>
             </Avatar>
             {/* Responsive Tooltip on hover, shown below avatar */}
-            <div className="absolute left-1/2 top-full z-50 mt-2 min-w-[180px] max-w-[90vw] sm:max-w-xs md:max-w-sm lg:max-w-md xl:max-w-lg -translate-x-1/2 hidden group-hover:flex flex-col items-center bg-white dark:bg-gray-900 text-black dark:text-white text-xs rounded shadow-lg px-3 py-2 whitespace-normal border border-gray-200 dark:border-gray-700 transition-all duration-200 box-border overflow-x-auto">
-              <span className="font-semibold break-words text-center w-full">
+            <div
+              className="user-tooltip invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-opacity duration-200"
+              style={{
+                position: "absolute",
+                top: "110%",
+                border: "1px solid #aaa",
+                borderRadius: "6px",
+                padding: "12px 8px",
+                right: "0",
+                backgroundColor: "#111"
+              }}
+            >
+              <span className="font-semibold break-words text-center w-full block mb-[5px]">
                 {user.displayName || "No Name"}
               </span>
               <span className="opacity-80 break-words text-center w-full">
@@ -94,7 +105,13 @@ const Header = () => {
 
   return (
     <div>
-      <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/75 backdrop-blur-sm supports-[backdrop-filter]:bg-background/60">
+      <header className="sticky top-0 z-50 w-full border-border/40 bg-background/75 backdrop-blur-sm supports-[backdrop-filter]:bg-background/60" style={{
+                position: "fixed",
+                backdropFilter: "blur(4px)",
+                backgroundColor: "hsl(250 30% 12% / .6)",
+                width: "100%",
+                zIndex: "1"
+              }}>
         <div className="container flex h-16 max-w-screen-2xl items-center mx-auto px-4">
           <Link
             to="/"
@@ -138,7 +155,7 @@ const Header = () => {
                 Logout
               </button>
               <div>Search</div>
-              <div>{renderAuthSection()}</div>
+              <div className="ml-2.5">{renderAuthSection()}</div>
             </>
           )}
         </div>
