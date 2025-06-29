@@ -1,4 +1,8 @@
 import { Brush, Film, Tv, VideoIcon, Wind } from "lucide-react";
+import { useEffect } from "react";
+import { getHollywoodMovies } from "../services/tmdb";
+import CarouselSectionSkeleton from "../ui/CarouselSectionSkeleton";
+import { ContentCarousel } from "./content/content-carousel";
 
 const HomeMoviesSection = () => {
   const moviesCategories = [
@@ -43,22 +47,37 @@ const HomeMoviesSection = () => {
       mediaTypeContext: "movie",
     },
   ];
+
+  useEffect(() => {
+    getHollywoodMovies().then((data) => {
+      console.log("Hollywood Movies Data:", data);
+    });
+  }, []);
+
   return (
     <>
       {moviesCategories.map((caterogies, index) => {
         return (
-          <div
-            key={index}
-            className="flex justify-between items-center mb-4 sm:mb-6 px-4"
-          >
-            <h2
-              className="text-2xl sm:text-3xl font-bold text-primary flex items-center"
-              style={{ color: "hsl(255 70% 68%)" }}
+          <section className="my-8 sm:my-10" key={index}>
+            <div
+              key={index}
+              className="flex justify-between items-center mb-4 sm:mb-6 px-4"
             >
-              {caterogies?.icon}
-              {caterogies?.title}
-            </h2>
-          </div>
+              <h2
+                className="text-2xl sm:text-3xl font-bold text-primary flex items-center"
+                style={{ color: "hsl(255 70% 68%)" }}
+              >
+                {caterogies?.icon}
+                {caterogies?.title}
+              </h2>
+            </div>
+            {true ? (
+              <CarouselSectionSkeleton icon={caterogies.icon} />
+            ) : (
+              <div>No data available</div>
+            )}
+            {<ContentCarousel items={moviesCategories} isUpcomingSection={false} />}
+          </section>
         );
       })}
     </>

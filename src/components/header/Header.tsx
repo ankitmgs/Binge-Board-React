@@ -135,7 +135,7 @@ const Header = () => {
           </Link>
           <button
             onClick={toggleTheme}
-            className="ml-auto mr-2 px-3 py-2 rounded bg-muted text-foreground hover:bg-muted/80 transition flex items-center"
+            className="ml-auto mr-2 px-3 py-2 rounded bg-[#3d3d5280] text-foreground hover:bg-[#3d3d5280]/80 transition flex items-center"
             aria-label="Toggle theme"
           >
             {theme === "dark" ? (

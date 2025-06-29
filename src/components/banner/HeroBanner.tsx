@@ -21,7 +21,7 @@ import { Skeleton } from "../../ui/skeleton";
 
 export function HeroBannerSkeleton() {
   return (
-    <div className="relative mx-4 sm:mx-6 md:mx-8 h-[40vh] sm:h-[50vh] md:h-[70vh] bg-muted/50 rounded-lg overflow-hidden shadow-lg mb-8">
+    <div className="relative mx-4 sm:mx-6 md:mx-8 h-[40vh] sm:h-[50vh] md:h-[70vh] bg-[#3d3d5280]/50 rounded-lg overflow-hidden shadow-lg mb-8">
       <Skeleton className="w-full h-full" />
       <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent"></div>
       <div className="absolute bottom-0 left-0 p-4 sm:p-6 md:p-8 max-w-2xl">
@@ -205,7 +205,7 @@ export function HeroBanner({ items }: any) {
                 className={`h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full transition-all duration-300 ${
                   currentSlide === index
                     ? "bg-primary scale-125"
-                    : "bg-muted-foreground/50 hover:bg-muted-foreground/80"
+                    : "bg-[#3d3d5280]-foreground/50 hover:bg-[#3d3d5280]-foreground/80"
                 }`}
                 aria-label={`Go to slide ${index + 1}`}
               />
