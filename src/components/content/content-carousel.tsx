@@ -1,13 +1,13 @@
 
 import { ScrollArea, ScrollBar } from "../../ui/scroll-area";
-import { ContentCard } from "./content-card";
+import ContentCard  from "./content-card";
 
 interface ContentCarouselProps {
   items: any[];
   isUpcomingSection?: boolean;
 }
 
-export function ContentCarousel({ items, isUpcomingSection = false }: ContentCarouselProps) {
+export function ContentCarousel({ items, isUpcomingSection = false }: ContentCarouselProps) {  
   return (
     <div>
       <ScrollArea className="w-full whitespace-nowrap rounded-md">

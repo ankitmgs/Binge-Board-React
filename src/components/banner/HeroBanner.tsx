@@ -52,7 +52,7 @@ export function HeroBanner({ items }: any) {
 
   if (!items || items.length === 0) {
     return (
-      <div className="relative mx-4 sm:mx-6 md:mx-8 h-[40vh] sm:h-[50vh] md:h-[70vh] bg-card rounded-lg overflow-hidden shadow-lg mb-8 flex items-center justify-center">
+      <div className="relative mx-4 sm:mx-6 md:mx-8 h-[40vh] sm:h-[50vh] md:h-[70vh] bg-[#262239] rounded-lg overflow-hidden shadow-lg mb-8 flex items-center justify-center">
         <p className="text-muted-foreground text-xl">
           No trending movies to display in the banner right now.
         </p>
@@ -63,7 +63,7 @@ export function HeroBanner({ items }: any) {
   const currentSlideData = items[currentSlide];
   if (!currentSlideData) {
     return (
-      <div className="relative mx-4 sm:mx-6 md:mx-8 h-[40vh] sm:h-[50vh] md:h-[70vh] bg-card rounded-lg overflow-hidden shadow-lg mb-8 flex items-center justify-center">
+      <div className="relative mx-4 sm:mx-6 md:mx-8 h-[40vh] sm:h-[50vh] md:h-[70vh] bg-[#262239] rounded-lg overflow-hidden shadow-lg mb-8 flex items-center justify-center">
         <p className="text-muted-foreground text-xl">
           Error displaying banner content.
         </p>
