@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 interface ContentCardProps {
   item: any; // Replace 'any' with a more specific type if available
 }
@@ -21,13 +23,13 @@ const ContentCard: React.FC<ContentCardProps> = ({ item }) => {
   
   return (
     <div className="rounded-lg border text-card-foreground w-44 sm:w-52 md:w-60 flex-shrink-0 overflow-hidden shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-primary/30 bg-[#262239] border-[#414158] group flex flex-col justify-between">
-      <a
+      <Link
         className="block outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-t-lg flex-grow"
-        href="/media/movie/1257960"
+        to={`/media/${item?.media_type}/${item?.id}`}
       >
         <div className="flex flex-col space-y-1.5 p-0 relative">
           <img
-            alt="Sikandar"
+            alt={item?.title || "Movie Poster"}
             data-ai-hint="movie poster"
             loading="lazy"
             width="240"
@@ -51,9 +53,9 @@ const ContentCard: React.FC<ContentCardProps> = ({ item }) => {
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
               className="lucide lucide-bookmark-plus h-5 w-5 text-white"
             >
               <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"></path>
@@ -65,7 +67,7 @@ const ContentCard: React.FC<ContentCardProps> = ({ item }) => {
         <div className="p-3 space-y-1">
           <div
             className="tracking-tight text-md font-semibold truncate text-foreground"
-            title="Sikandar"
+            title={item?.title || "Movie Title"}
           >
             {item?.title}
           </div>
@@ -80,9 +82,9 @@ const ContentCard: React.FC<ContentCardProps> = ({ item }) => {
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
               className="lucide lucide-calendar-days mr-1.5 h-3.5 w-3.5 text-blue-400"
             >
               <path d="M8 2v4"></path>
@@ -99,7 +101,7 @@ const ContentCard: React.FC<ContentCardProps> = ({ item }) => {
             <span>{formatDate(item?.release_date)}</span>
           </div>
         </div>
-      </a>
+      </Link>
       <div className="flex items-center p-3 pt-2 mt-auto">
         <button
           className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 border-[#414158] border-input bg-[#181528] hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3 w-full transition-all duration-200 ease-in-out"
@@ -112,9 +114,9 @@ const ContentCard: React.FC<ContentCardProps> = ({ item }) => {
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
             className="lucide lucide-bookmark-plus mr-2 h-4 w-4"
           >
             <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"></path>

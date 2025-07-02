@@ -110,7 +110,7 @@ const Header = () => {
                 backdropFilter: "blur(4px)",
                 backgroundColor: "hsl(250 30% 12% / .6)",
                 width: "100%",
-                zIndex: "1"
+                zIndex: "11"
               }}>
         <div className="container flex h-16 max-w-screen-2xl items-center mx-auto px-4">
           <Link

@@ -17,6 +17,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { onAuthStateChanged, auth } from "./services/firebase";
 import { useDispatch } from "react-redux";
 import { setUser, clearUser } from "./userSlice";
+import MovieDetail from "./pages/MovieDetail";
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
@@ -67,6 +68,7 @@ function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/me" element={<Profile />} />
+                <Route path="/media/:type/:id" element={<MovieDetail />} />
               </Routes>
             </PrivateRoute>
           }
