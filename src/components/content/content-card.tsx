@@ -70,7 +70,7 @@ const ContentCard: React.FC<ContentCardProps> = ({ item }) => {
             {item?.title}
           </div>
           <div className="inline-flex items-center rounded-full border px-2.5 py-0.5 font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80 mt-1 text-xs">
-            Action{" "}
+            {item?.genre}
           </div>
           <div className="flex items-center text-xs text-muted-foreground pt-1">
             <svg

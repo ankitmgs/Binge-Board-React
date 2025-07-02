@@ -1,10 +1,13 @@
 import { TMDB_BACKDROP_BASE_URL, TMDB_IMAGE_BASE_URL } from "../constant/apiUrl";
+import { MOVIE_GENRES } from "../constant/movieGenres";
+import { TV_GENRES } from "../constant/tvGenres";
 
-
-
-
-let movieGenreMap: Map<number, string> | null = null;
-let tvGenreMap: Map<number, string> | null = null;
+let movieGenreMap: Map<number, string> | null = new Map(
+  MOVIE_GENRES.map((g) => [g.id, g.name])
+);
+let tvGenreMap: Map<number, string> | null = new Map(
+  TV_GENRES.map((g) => [g.id, g.name])
+);
 
 export interface Recommendation {
   id: string; // TMDB ID, or generated ID for hardcoded items, or IMDb ID
