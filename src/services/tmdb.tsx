@@ -162,7 +162,7 @@ export const getNowPlayingMovies = async (): Promise<any> => {
     const payload = {
       language: "en-US",
       page: "1",
-      region: "US"
+      region: "US",
     };
     const queryParams = new URLSearchParams({
       ...payload,
@@ -189,7 +189,7 @@ export const getNowPlayingMovies = async (): Promise<any> => {
 };
 
 export const getMediaDetails = async (
-  mediaType: 'movie' | 'tv',
+  mediaType: "movie" | "tv",
   id: string
 ): Promise<any> => {
   try {
@@ -203,5 +203,24 @@ export const getMediaDetails = async (
   } catch (error: any) {
     console.error("Error fetching media details:", error);
     return { error: true, message: "Error fetching media details." };
+  }
+};
+
+export const getMediaImages = async (
+  mediaType: "movie" | "tv",
+  id: string
+): Promise<any> => {
+  try {
+    const url = `${TMDB_BASE_URL}/${mediaType}/${id}/images?api_key=${TMDB_API_KEY}`;
+
+    const result = await axios.get(url);
+    if (result?.status !== 200) {
+      console.error("TMDB API error:", result.status, result.statusText);
+      return { error: true, message: `TMDB API error: ${result.statusText}` };
+    }
+    return result?.data;
+  } catch (error: any) {
+    console.error("Error fetching media images:", error);
+    return { error: true, message: "Error fetching media images." };
   }
 };

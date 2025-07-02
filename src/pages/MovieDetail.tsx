@@ -1,18 +1,31 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getMediaDetails } from "../services/tmdb";
+import { getMediaDetails, getMediaImages } from "../services/tmdb";
+import { TMDB_IMAGE_BASE_URL } from "../constant/apiUrl";
+import MovieDetailsGallery from "../components/MovieDetail/MovieDetailsGallery";
 
 const MovieDetail = () => {
   const { type, id } = useParams<{ type: string; id: string }>();
+  const [movieDetails, setMovieDetails] = useState(null);
+  const [mediaImages, setMediaImages] = useState([]);
   console.log("Movie ID:", id, type);
 
   const getMoviesDetails = async () => {
-    const response = await getMediaDetails(type, id);
-    console.log(response);
+    if (!type || !id) return;
+    const response = await getMediaDetails(type as "movie" | "tv", id);
+    setMovieDetails(response);
+  };
+
+  const getMediaImagesAPI = async () => {
+    if (!type || !id) return;
+    const response = await getMediaImages(type as "movie" | "tv", id);
+    const images = (response?.backdrops || []).map((b: { file_path: string }) => `${TMDB_IMAGE_BASE_URL}${b.file_path}`);
+    setMediaImages(images);
   };
 
   useEffect(() => {
     getMoviesDetails();
+    getMediaImagesAPI();
   }, []);
 
   return (
@@ -227,13 +240,12 @@ const MovieDetail = () => {
               className="relative overflow-hidden w-full whitespace-nowrap rounded-md pb-4"
               style={{ position: "relative" }}
             >
-                <div className="h-full w-full rounded-[inherit]" style={{overflow: "scroll"}}>
-                    <div style={{minWidth: "100%", display: "table"}}>
-                        <div className="flex space-x-4">
-                            Here the slider will come
-                        </div>
-                    </div>
+              <div className="h-full w-full rounded-[inherit]" style={{ overflow: "scroll" }}>
+                <div style={{ minWidth: "100%", display: "table" }}>
+                  <div className="flex space-x-4">Here the slider will come</div>
                 </div>
+              </div>
+              <MovieDetailsGallery images={mediaImages} />
             </div>
           </div>
         </div>
