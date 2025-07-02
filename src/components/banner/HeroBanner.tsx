@@ -36,7 +36,7 @@ export function HeroBannerSkeleton() {
   );
 }
 
-export function HeroBanner({ items }: any) {
+export function HeroBanner({ items, loading }: any) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isTrailerLoading, setIsTrailerLoading] = useState(false);
 
@@ -49,6 +49,10 @@ export function HeroBanner({ items }: any) {
 
     return () => clearTimeout(timer);
   }, [currentSlide, items]);
+
+  if (loading) {
+    return <HeroBannerSkeleton />;
+  }
 
   if (!items || items.length === 0) {
     return (

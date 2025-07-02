@@ -157,3 +157,33 @@ export const getAnimatedMovies = async (): Promise<any> => {
     return { error: true, message: "Error fetching Bollywood movies." };
   }
 };
+export const getNowPlayingMovies = async (): Promise<any> => {
+  try {
+    const payload = {
+      language: "en-US",
+      page: "1",
+      region: "US"
+    };
+    const queryParams = new URLSearchParams({
+      ...payload,
+      api_key: TMDB_API_KEY,
+    }).toString();
+    const url = `${TMDB_BASE_URL}/movie/now_playing?${queryParams}`;
+
+    const result = await axios.get(url);
+    if (result.status !== 200) {
+      console.error("TMDB API error:", result.status, result.statusText);
+      return { error: true, message: `TMDB API error: ${result.statusText}` };
+    }
+    if (!result.data || !Array.isArray(result.data.results)) {
+      console.error("TMDB API returned unexpected data:", result.data);
+      return { error: true, message: "TMDB API returned unexpected data." };
+    }
+    return result.data.results
+      .map((item: any) => mapTmdbItemToRecommendation(item, "movie"))
+      .filter(Boolean) as Recommendation[];
+  } catch (error: any) {
+    console.error("Error fetching Now Playing movies:", error);
+    return { error: true, message: "Error fetching Now Playing movies." };
+  }
+};

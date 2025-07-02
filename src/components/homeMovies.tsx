@@ -10,75 +10,76 @@ import {
 import CarouselSectionSkeleton from "../ui/CarouselSectionSkeleton";
 import { ContentCarousel } from "./content/content-carousel";
 
+const moviesCategories = [
+  {
+    id: "hollywood",
+    title: "Hollywood Movies",
+    icon: (
+      <Film className="mr-2 sm:mr-3 h-5 w-5 sm:h-6 sm:w-6 text-primary/80" />
+    ),
+    mediaTypeContext: "movie",
+    fetcher: getHollywoodMovies,
+  },
+  {
+    id: "bollywood",
+    title: "Bollywood Movies",
+    icon: (
+      <VideoIcon className="mr-2 sm:mr-3 h-5 w-5 sm:h-6 sm:w-6 text-primary/80" />
+    ),
+    mediaTypeContext: "movie",
+    fetcher: getBollyWoodMovies,
+  },
+  {
+    id: "webseries",
+    title: "Web Series",
+    icon: (
+      <Tv className="mr-2 sm:mr-3 h-5 w-5 sm:h-6 sm:w-6 text-primary/80" />
+    ),
+    mediaTypeContext: "tv",
+    fetcher: getWebSeries,
+  },
+  {
+    id: "anime",
+    title: "Popular Anime Series",
+    icon: (
+      <Wind className="mr-2 sm:mr-3 h-5 w-5 sm:h-6 sm:w-6 text-primary/80" />
+    ),
+    mediaTypeContext: "tv",
+    fetcher: getAnimeSeries,
+  },
+  {
+    id: "animation",
+    title: "Animated Movies",
+    icon: (
+      <Brush className="mr-2 sm:mr-3 h-5 w-5 sm:h-6 sm:w-6 text-primary/80" />
+    ),
+    mediaTypeContext: "movie",
+    fetcher: getAnimatedMovies,
+  },
+];
+
 const HomeMoviesSection = () => {
   const [categoryData, setCategoryData] = useState<{ [key: string]: any[] }>({});
-  const [loading, setLoading] = useState<{ [key: string]: boolean }>({});
+  const initialLoading = Object.fromEntries(
+    moviesCategories.map((cat) => [cat.id, true])
+  );
+  const [loading, setLoading] = useState<{ [key: string]: boolean }>(initialLoading);
   const [error, setError] = useState<{ [key: string]: string | null }>({});
 
-  const moviesCategories = [
-    {
-      id: "hollywood",
-      title: "Hollywood Movies",
-      icon: (
-        <Film className="mr-2 sm:mr-3 h-5 w-5 sm:h-6 sm:w-6 text-primary/80" />
-      ),
-      mediaTypeContext: "movie",
-      fetcher: getHollywoodMovies,
-    },
-    {
-      id: "bollywood",
-      title: "Bollywood Movies",
-      icon: (
-        <VideoIcon className="mr-2 sm:mr-3 h-5 w-5 sm:h-6 sm:w-6 text-primary/80" />
-      ),
-      mediaTypeContext: "movie",
-      fetcher: getBollyWoodMovies,
-    },
-    {
-      id: "webseries",
-      title: "Web Series",
-      icon: (
-        <Tv className="mr-2 sm:mr-3 h-5 w-5 sm:h-6 sm:w-6 text-primary/80" />
-      ),
-      mediaTypeContext: "tv",
-      fetcher: getWebSeries,
-    },
-    {
-      id: "anime",
-      title: "Popular Anime Series",
-      icon: (
-        <Wind className="mr-2 sm:mr-3 h-5 w-5 sm:h-6 sm:w-6 text-primary/80" />
-      ),
-      mediaTypeContext: "tv",
-      fetcher: getAnimeSeries,
-    },
-    {
-      id: "animation",
-      title: "Animated Movies",
-      icon: (
-        <Brush className="mr-2 sm:mr-3 h-5 w-5 sm:h-6 sm:w-6 text-primary/80" />
-      ),
-      mediaTypeContext: "movie",
-      fetcher: getAnimatedMovies,
-    },
-  ];
-
   useEffect(() => {
-    // Use Promise.all to fetch all categories in parallel and avoid closure issues
     const fetchAll = async () => {
       const newCategoryData: { [key: string]: any[] } = {};
       const newLoading: { [key: string]: boolean } = {};
       const newError: { [key: string]: string | null } = {};
+      // Set all loading to true before fetching
+      moviesCategories.forEach((cat) => {
+        newLoading[cat.id] = true;
+      });
+      setLoading({ ...newLoading });
       await Promise.all(
         moviesCategories.map(async (cat) => {
-          newLoading[cat.id] = true;
-          console.log("webseries", cat.id);
-          if (cat.id === "webseries") {
-            console.warn("webseries", cat.id, "is not implemented yet");
-          }
           try {
             const data = await cat.fetcher();
-            console.log("Fetched data for category:", cat.id, data);
             if (data?.error) {
               newError[cat.id] = data.message || "Error fetching data";
               newCategoryData[cat.id] = [];
