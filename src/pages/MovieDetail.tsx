@@ -240,11 +240,11 @@ const MovieDetail = () => {
               className="relative overflow-hidden w-full whitespace-nowrap rounded-md pb-4"
               style={{ position: "relative" }}
             >
-              <div className="h-full w-full rounded-[inherit]" style={{ overflow: "scroll" }}>
+              {/* <div className="h-full w-full rounded-[inherit]" style={{ overflow: "scroll" }}>
                 <div style={{ minWidth: "100%", display: "table" }}>
                   <div className="flex space-x-4">Here the slider will come</div>
                 </div>
-              </div>
+              </div> */}
               <MovieDetailsGallery images={mediaImages} />
             </div>
           </div>
