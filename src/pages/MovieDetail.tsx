@@ -200,9 +200,9 @@ function formatDateToReadable(dateString: string = ""): string {
                 {movieDetails?.title || "Movie Title"}
               </span>
             </h1>
-            <p className="text-lg sm:text-xl text-[#8585ad] italic mb-4 sm:mb-6">
+            {movieDetails?.tagline && <p className="text-lg sm:text-xl text-[#8585ad] italic mb-4 sm:mb-6">
               {movieDetails?.tagline || "Unknown tagline"}
-            </p>
+            </p>}
             <div className="flex flex-wrap items-center gap-x-3 sm:gap-x-4 gap-y-2 mb-3 sm:mb-4 text-sm sm:text-base">
               <div className="flex items-center">
                 <svg
@@ -413,7 +413,7 @@ function formatDateToReadable(dateString: string = ""): string {
               <h2 className="text-xl sm:text-2xl font-semibold mb-2 mt-6 text-[#9174e7]">
                 Status
               </h2>
-              <p className="text-base md:text-lg text-[#8585ad]">Released</p>
+              <p className="text-base md:text-lg text-[#8585ad]">{movieDetails?.status || "Unknown Status"}</p>
             </div>
             <div className="mt-8 sm:mt-12">
               <CastDetails mediaCredits={mediaCredits} />

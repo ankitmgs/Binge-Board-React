@@ -6,7 +6,7 @@ const CastDetails = ({ mediaCredits }: any) => {
           role="none"
           className="shrink-0 bg-border h-[1px] w-full my-6 sm:my-8"
         ></div>
-        <h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 text-primary flex items-center">
+        <h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 text-[#9174e7] flex items-center">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
