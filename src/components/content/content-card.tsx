@@ -67,9 +67,9 @@ const ContentCard: React.FC<ContentCardProps> = ({ item }) => {
         <div className="p-3 space-y-1">
           <div
             className="tracking-tight text-md font-semibold truncate text-foreground"
-            title={item?.title || "Movie Title"}
+            title={item?.title || item?.name || "Untitled"}
           >
-            {item?.title}
+            {item?.title || item?.name || "Untitled"}
           </div>
           <div className="inline-flex items-center rounded-full border px-2.5 py-0.5 font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80 mt-1 text-xs">
             {item?.genre}
@@ -98,7 +98,7 @@ const ContentCard: React.FC<ContentCardProps> = ({ item }) => {
               <path d="M12 18h.01"></path>
               <path d="M16 18h.01"></path>
             </svg>
-            <span>{formatDate(item?.release_date)}</span>
+            <span>{formatDate(item?.release_date || item?.first_air_date)}</span>
           </div>
         </div>
       </Link>

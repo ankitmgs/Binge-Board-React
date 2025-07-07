@@ -197,7 +197,7 @@ function formatDateToReadable(dateString: string = ""): string {
                     "linear-gradient(to right, hsl(255 70% 68%) , hsl(220 85% 70%) , hsl(255 70% 68%))",
                 }}
               >
-                {movieDetails?.title || "Movie Title"}
+                {movieDetails?.title || movieDetails?.name || "Movie Title"}
               </span>
             </h1>
             {movieDetails?.tagline && <p className="text-lg sm:text-xl text-[#8585ad] italic mb-4 sm:mb-6">
@@ -251,7 +251,7 @@ function formatDateToReadable(dateString: string = ""): string {
                   <path d="M16 18h.01"></path>
                 </svg>
                 <span>
-                  {formatDateToReadable(movieDetails?.release_date || "")}
+                  {formatDateToReadable(movieDetails?.release_date || movieDetails?.first_air_date || "")}
                 </span>
               </div>
               <div className="flex items-center">
@@ -270,7 +270,8 @@ function formatDateToReadable(dateString: string = ""): string {
                   <circle cx="12" cy="12" r="10"></circle>
                   <polyline points="12 6 12 12 16 14"></polyline>
                 </svg>
-                <span>{formatRuntime(movieDetails?.runtime)}</span>
+                {movieDetails?.runtime &&<span>{formatRuntime(movieDetails?.runtime)}</span>}
+                {movieDetails?.episode_run_time &&<span>{movieDetails?.episode_run_time}m</span>}
               </div>
               <div className="flex items-center">
                 <svg
