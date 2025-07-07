@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState, useRef } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import logo from "../../assets/logo.png";
 import { signOut, auth } from "../../services/firebase";
 import { toast } from "react-toastify";
-import { Sun, Moon } from "lucide-react";
+import { Sun, Moon, Search } from "lucide-react";
 import { onAuthStateChanged } from "../../services/firebase";
 import { useSelector, useDispatch } from "react-redux";
 import type { RootState } from "../../store";
@@ -14,6 +14,7 @@ import { getInitials } from "../../helper";
 
 const Header = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.user) as {
     uid: string | null;
@@ -25,6 +26,9 @@ const Header = () => {
     () => localStorage.getItem("theme") || "light"
   );
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     document.documentElement.classList.remove("light", "dark");
@@ -39,6 +43,21 @@ const Header = () => {
     return () => unsubscribe();
   }, []);
 
+  // Close search input when clicking outside
+  useEffect(() => {
+    if (!showSearch) return;
+    function handleClick(e: MouseEvent) {
+      if (
+        searchInputRef.current &&
+        !searchInputRef.current.contains(e.target as Node)
+      ) {
+        setShowSearch(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [showSearch]);
+
   const handleLogout = async () => {
     try {
       await signOut(auth);
@@ -52,6 +71,18 @@ const Header = () => {
 
   const toggleTheme = () => {
     setTheme((prev) => (prev === "light" ? "dark" : "light"));
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchValue(value);
+    if (value.trim()) {
+      navigate(`/search?q=${encodeURIComponent(value)}`);
+    } else {
+      if (location.pathname.startsWith("/search")) {
+        navigate("/");
+      }
+    }
   };
 
   const renderAuthSection = () => {
@@ -86,7 +117,7 @@ const Header = () => {
                 borderRadius: "6px",
                 padding: "12px 8px",
                 right: "0",
-                backgroundColor: "#111"
+                backgroundColor: "#111",
               }}
             >
               <span className="font-semibold break-words text-center w-full block mb-[5px]">
@@ -105,13 +136,16 @@ const Header = () => {
 
   return (
     <div>
-      <header className="sticky top-0 z-50 w-full border-border/40 bg-background/75 backdrop-blur-sm supports-[backdrop-filter]:bg-background/60" style={{
-                position: "fixed",
-                backdropFilter: "blur(4px)",
-                backgroundColor: "hsl(250 30% 12% / .6)",
-                width: "100%",
-                zIndex: "11"
-              }}>
+      <header
+        className="sticky top-0 z-50 w-full border-border/40 bg-background/75 backdrop-blur-sm supports-[backdrop-filter]:bg-background/60"
+        style={{
+          position: "fixed",
+          backdropFilter: "blur(4px)",
+          backgroundColor: "hsl(250 30% 12% / .6)",
+          width: "100%",
+          zIndex: "11",
+        }}
+      >
         <div className="container flex h-16 max-w-screen-2xl items-center mx-auto px-4">
           <Link
             to="/"
@@ -154,7 +188,42 @@ const Header = () => {
               >
                 Logout
               </button>
-              <div>Search</div>
+              <div className="relative ml-2 flex items-center">
+                <div
+                  className={`transition-all duration-300 ${
+                    showSearch
+                      ? "w-64 opacity-100 scale-100 mr-2"
+                      : "w-0 opacity-0 scale-95 mr-0"
+                  } overflow-hidden`}
+                >
+                  <input
+                    ref={searchInputRef}
+                    id="header-search-input"
+                    name="header-search"
+                    type="text"
+                    value={searchValue}
+                    onChange={handleSearchChange}
+                    className="w-full px-4 py-2 rounded bg-[#23223a] text-white border border-[#363649] shadow focus:outline-none focus:ring-primary transition-all"
+                    placeholder="Search movies, shows..."
+                    autoFocus={showSearch}
+                    style={{ minWidth: showSearch ? "8rem" : "0" }}
+                  />
+                </div>
+                <button
+                  onClick={() => {
+                    setShowSearch((prev) => !prev);
+                    setTimeout(() => {
+                      if (!showSearch && searchInputRef.current) {
+                        searchInputRef.current.focus();
+                      }
+                    }, 0);
+                  }}
+                  className="p-2 rounded-full bg-[#23223a] hover:bg-[#2d2d43] transition-colors text-primary focus:outline-none"
+                  aria-label="Search"
+                >
+                  <Search className="h-5 w-5" />
+                </button>
+              </div>
               <div className="ml-2.5">{renderAuthSection()}</div>
             </>
           )}
