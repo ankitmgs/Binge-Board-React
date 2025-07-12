@@ -14,6 +14,14 @@ import MovieDetailsGallery from "../components/MovieDetail/MovieDetailsGallery";
 import CastDetails from "../components/MovieDetail/CastDetails";
 import { Skeleton } from "../ui/skeleton";
 import { PlayCircle } from "lucide-react";
+import { Label } from "../ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 
 const MovieDetail = () => {
   const { type, id } = useParams<{ type: string; id: string }>();
@@ -23,6 +31,10 @@ const MovieDetail = () => {
   const [watchProviders, setWatchProviders] = useState<null | any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedSeasonData, setSelectedSeasonData] = useState<{
+    season_number: string;
+    name: string;
+  } | null>(null);
   console.log("Movie ID:", movieDetails);
 
   const getMoviesDetails = async () => {
@@ -83,21 +95,21 @@ const MovieDetail = () => {
     ]).finally(() => setLoading(false));
   }, [type, id]);
 
-function formatDateToReadable(dateString: string = ""): string {
-  const date = new Date(dateString);
+  function formatDateToReadable(dateString: string = ""): string {
+    const date = new Date(dateString);
 
-  if (isNaN(date.getTime())) {
-    return "Invalid date";
+    if (isNaN(date.getTime())) {
+      return "Invalid date";
+    }
+
+    const options: Intl.DateTimeFormatOptions = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    };
+
+    return new Intl.DateTimeFormat("en-US", options).format(date);
   }
-
-  const options: Intl.DateTimeFormatOptions = {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  };
-
-  return new Intl.DateTimeFormat("en-US", options).format(date);
-}
 
   function formatRuntime(runtimeMinutes: number | undefined): string {
     if (runtimeMinutes === undefined || runtimeMinutes === 0) return "N/A";
@@ -169,7 +181,13 @@ function formatDateToReadable(dateString: string = ""): string {
               color: "transparent",
             }}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent bg-custom-gradient" style={{backgroundImage: "linear-gradient(0deg, hsl(250 30% 12% / 1), transparent)"}}></div>
+          <div
+            className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent bg-custom-gradient"
+            style={{
+              backgroundImage:
+                "linear-gradient(0deg, hsl(250 30% 12% / 1), transparent)",
+            }}
+          ></div>
         </div>
         <div className="flex flex-col md:flex-row gap-6 sm:gap-8 relative -mt-24 sm:-mt-32 md:-mt-48 z-10">
           <div className="w-full md:w-1/3 flex-shrink-0">
@@ -200,9 +218,11 @@ function formatDateToReadable(dateString: string = ""): string {
                 {movieDetails?.title || movieDetails?.name || "Movie Title"}
               </span>
             </h1>
-            {movieDetails?.tagline && <p className="text-lg sm:text-xl text-[#8585ad] italic mb-4 sm:mb-6">
-              {movieDetails?.tagline || "Unknown tagline"}
-            </p>}
+            {movieDetails?.tagline && (
+              <p className="text-lg sm:text-xl text-[#8585ad] italic mb-4 sm:mb-6">
+                {movieDetails?.tagline || "Unknown tagline"}
+              </p>
+            )}
             <div className="flex flex-wrap items-center gap-x-3 sm:gap-x-4 gap-y-2 mb-3 sm:mb-4 text-sm sm:text-base">
               <div className="flex items-center">
                 <svg
@@ -251,28 +271,38 @@ function formatDateToReadable(dateString: string = ""): string {
                   <path d="M16 18h.01"></path>
                 </svg>
                 <span>
-                  {formatDateToReadable(movieDetails?.release_date || movieDetails?.first_air_date || "")}
+                  {formatDateToReadable(
+                    movieDetails?.release_date ||
+                      movieDetails?.first_air_date ||
+                      ""
+                  )}
                 </span>
               </div>
-              <div className="flex items-center">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="lucide lucide-clock h-4 w-4 sm:h-5 sm:w-5 mr-1.5 sm:mr-2 text-green-400"
-                >
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <polyline points="12 6 12 12 16 14"></polyline>
-                </svg>
-                {movieDetails?.runtime &&<span>{formatRuntime(movieDetails?.runtime)}</span>}
-                {movieDetails?.episode_run_time &&<span>{movieDetails?.episode_run_time}m</span>}
-              </div>
+              {(movieDetails?.runtime || movieDetails?.episode_run_time[0]) && (
+                <div className="flex items-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="lucide lucide-clock h-4 w-4 sm:h-5 sm:w-5 mr-1.5 sm:mr-2 text-green-400"
+                  >
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                  {movieDetails?.runtime && (
+                    <span>{formatRuntime(movieDetails?.runtime)}</span>
+                  )}
+                  {movieDetails?.episode_run_time[0] && (
+                    <span>{movieDetails?.episode_run_time}m</span>
+                  )}
+                </div>
+              )}
               <div className="flex items-center">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -390,6 +420,63 @@ function formatDateToReadable(dateString: string = ""): string {
             </div>
           </div>
         </div>
+        {type === "tv" && (
+          <div className="mt-8 sm:mt-12">
+            <div
+              data-orientation="horizontal"
+              role="none"
+              className="shrink-0 bg-[#414158] h-[1px] w-full my-6 sm:my-8"
+            ></div>
+            <h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 text-[#9174e7]">
+              Seasons &amp; Episodes
+            </h2>
+            <div className="space-y-6">
+              <div>
+                <Label
+                  htmlFor="season-select-detail"
+                  className="text-base font-medium mb-2 block"
+                >
+                  Select a Season
+                </Label>
+                <Select
+                  value={selectedSeasonData?.season_number || ""}
+                  onValueChange={(value) => {
+                    const season = movieDetails?.seasons.find(
+                      (s) => s.season_number.toString() === value
+                    );
+                    setSelectedSeasonData(
+                      season
+                        ? {
+                            season_number: season.season_number.toString(),
+                            name: season.name,
+                          }
+                        : null
+                    );
+                  }}
+                >
+                  <SelectTrigger
+                    id="season-select-detail"
+                    className="w-full md:w-1/2 lg:w-1/3 bg-[#262239] border-[#414158] hover:border-primary/50 focus:border-primary focus:ring-primary"
+                  >
+                    <SelectValue placeholder="Choose a season" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#262239] border-[#414158]">
+                    {movieDetails?.seasons?.map((season) => (
+                      <SelectItem
+                        key={season.id}
+                        value={season.season_number.toString()}
+                        className="hover:bg-[#719df4] focus:bg-[#719df4] hover:text-black"
+                      >
+                        {season.name} (Season {season.season_number}) -{" "}
+                        {season.episode_count} episodes
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+        )}
         <div className="mt-8 sm:mt-12">
           <div
             data-orientation="horizontal"
@@ -414,7 +501,9 @@ function formatDateToReadable(dateString: string = ""): string {
               <h2 className="text-xl sm:text-2xl font-semibold mb-2 mt-6 text-[#9174e7]">
                 Status
               </h2>
-              <p className="text-base md:text-lg text-[#8585ad]">{movieDetails?.status || "Unknown Status"}</p>
+              <p className="text-base md:text-lg text-[#8585ad]">
+                {movieDetails?.status || "Unknown Status"}
+              </p>
             </div>
             <div className="mt-8 sm:mt-12">
               <CastDetails mediaCredits={mediaCredits} />

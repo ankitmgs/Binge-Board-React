@@ -1,4 +1,8 @@
-import { TMDB_BASE_URL, TMDB_IMAGE_BASE_URL, TMDB_PROVIDER_LOGO_BASE_URL } from "../constant/apiUrl";
+import {
+  TMDB_BASE_URL,
+  TMDB_IMAGE_BASE_URL,
+  TMDB_PROVIDER_LOGO_BASE_URL,
+} from "../constant/apiUrl";
 const TMDB_API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 import axios from "axios";
 import { mapTmdbItemToRecommendation, type Recommendation } from "../helper";
@@ -225,10 +229,13 @@ export const getMediaImages = async (
   }
 };
 
-export async function getMediaCredits(id: string, mediaType: 'movie' | 'tv'): Promise<any | null> {
+export async function getMediaCredits(
+  id: string,
+  mediaType: "movie" | "tv"
+): Promise<any | null> {
   try {
-    let endpoint = '';
-    if (mediaType === 'tv') {
+    let endpoint = "";
+    if (mediaType === "tv") {
       endpoint = `tv/${id}/aggregate_credits`;
     } else {
       endpoint = `movie/${id}/credits`;
@@ -236,52 +243,105 @@ export async function getMediaCredits(id: string, mediaType: 'movie' | 'tv'): Pr
     const url = `${TMDB_BASE_URL}/${endpoint}?api_key=${TMDB_API_KEY}&language=en-US`;
     const response = await axios.get(url);
     if (!response || !response.data) {
-      console.warn(`[TMDB Service - Credits] No data received for ${mediaType}/${id}.`);
+      console.warn(
+        `[TMDB Service - Credits] No data received for ${mediaType}/${id}.`
+      );
       return { id: parseInt(id, 10), cast: [] };
     }
     const data = response.data;
     if (!Array.isArray(data.cast)) {
-      console.warn(`[TMDB Service - Credits] Cast data is not an array for ${mediaType}/${id}. Data received:`, data);
+      console.warn(
+        `[TMDB Service - Credits] Cast data is not an array for ${mediaType}/${id}. Data received:`,
+        data
+      );
       return { id: parseInt(id, 10), cast: [] };
     }
     const castWithFullProfileUrls = data.cast.map((member: any) => ({
       id: member.id,
       name: member.name,
-      character: mediaType === 'tv' ? (member.roles && member.roles[0] ? member.roles[0].character : 'N/A') : member.character,
-      profile_path: member.profile_path ? `${TMDB_IMAGE_BASE_URL}${member.profile_path}` : null,
-      order: member.order !== undefined ? member.order : (member.roles && member.roles[0] ? member.roles[0].order : 999),
-      total_episode_count: mediaType === 'tv' ? member.total_episode_count : undefined,
+      character:
+        mediaType === "tv"
+          ? member.roles && member.roles[0]
+            ? member.roles[0].character
+            : "N/A"
+          : member.character,
+      profile_path: member.profile_path
+        ? `${TMDB_IMAGE_BASE_URL}${member.profile_path}`
+        : null,
+      order:
+        member.order !== undefined
+          ? member.order
+          : member.roles && member.roles[0]
+          ? member.roles[0].order
+          : 999,
+      total_episode_count:
+        mediaType === "tv" ? member.total_episode_count : undefined,
     }));
     return { id: parseInt(id, 10), cast: castWithFullProfileUrls as any[] };
   } catch (error: any) {
-    console.error(`[TMDB Service - Credits] Error fetching credits for ${mediaType}/${id}:`, error);
+    console.error(
+      `[TMDB Service - Credits] Error fetching credits for ${mediaType}/${id}:`,
+      error
+    );
     return { id: parseInt(id, 10), cast: [] };
   }
 }
 
-
-export async function getWatchProviders(id: string, mediaType: 'movie' | 'tv'): Promise<any | null> {
+export async function getWatchProviders(
+  id: string,
+  mediaType: "movie" | "tv"
+): Promise<any | null> {
   const endpoint = `${mediaType}/${id}/watch/providers`;
-  const result = await axios.get(`${TMDB_BASE_URL}/${endpoint}?api_key=${TMDB_API_KEY}&language=en-US`);
+  const result = await axios.get(
+    `${TMDB_BASE_URL}/${endpoint}?api_key=${TMDB_API_KEY}&language=en-US`
+  );
 
   if (result && result.data && result.data.results && result.data.results.IN) {
     const inProviders = result.data.results.IN;
 
     const processProviderList = (providers?: any[]): any[] | undefined => {
       if (!providers || !Array.isArray(providers)) return undefined;
-      return providers.map(p => ({
-        ...p,
-        logo_path: p.logo_path ? `${TMDB_PROVIDER_LOGO_BASE_URL}${p.logo_path}` : null,
-      })).sort((a,b) => a.display_priority - b.display_priority);
+      return providers
+        .map((p) => ({
+          ...p,
+          logo_path: p.logo_path
+            ? `${TMDB_PROVIDER_LOGO_BASE_URL}${p.logo_path}`
+            : null,
+        }))
+        .sort((a, b) => a.display_priority - b.display_priority);
     };
 
     return {
-      link: inProviders.link || `https://www.themoviedb.org/${mediaType}/${id}/watch?locale=IN`,
+      link:
+        inProviders.link ||
+        `https://www.themoviedb.org/${mediaType}/${id}/watch?locale=IN`,
       flatrate: processProviderList(inProviders.flatrate),
       rent: processProviderList(inProviders.rent),
       ads: processProviderList(inProviders.ads),
     };
   }
-  // console.log(`[TMDB Service - Watch Providers] No 'IN' region data found for ${mediaType}/${id}. Full response results:`, data?.results);
   return null;
 }
+
+export const getTvSeasonEpisodes = async (
+  tvId: string,
+  seasonNumber: number
+): Promise<any | null> => {
+  try {
+    const url = `${TMDB_BASE_URL}/tv/${tvId}/season/${seasonNumber}?api_key=${TMDB_API_KEY}&language=en-US`;
+    const response = await axios.get(url);
+    if (!response || !response.data) {
+      console.warn(
+        `[TMDB Service - TV Season Episodes] No data received for TV ID ${tvId}, Season ${seasonNumber}.`
+      );
+      return null;
+    }
+    return response.data;
+  } catch (error: any) {
+    console.error(
+      `[TMDB Service - TV Season Episodes] Error fetching episodes for TV ID ${tvId}, Season ${seasonNumber}:`,
+      error
+    );
+    return null;
+  }
+};
