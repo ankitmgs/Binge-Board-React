@@ -37,9 +37,7 @@ const ContentCard: React.FC<ContentCardProps> = ({ item }) => {
             decoding="async"
             data-nimg="1"
             className="object-cover w-full h-56 sm:h-64 md:h-80 rounded-lg"
-            // srcset="/_next/image?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2F41s42CRXafa3OuRGvCtfYPEBmse.jpg&amp;w=256&amp;q=75 1x, /_next/image?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2F41s42CRXafa3OuRGvCtfYPEBmse.jpg&amp;w=640&amp;q=75 2x"
             src={item?.posterUrl}
-            // style="color: transparent;"
             style={{ color: "transparent" }}
           />
           <button
@@ -71,7 +69,7 @@ const ContentCard: React.FC<ContentCardProps> = ({ item }) => {
           >
             {item?.title || item?.name || "Untitled"}
           </div>
-          <div className="inline-flex items-center rounded-full border px-2.5 py-0.5 font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80 mt-1 text-xs">
+          <div className="inline-flex items-center rounded-full border px-2.5 py-0.5 font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-[#2d2d43] text-secondary-foreground hover:bg-[#2d2d43]/80 mt-1 text-xs">
             {item?.genre}
           </div>
           <div className="flex items-center text-xs text-muted-foreground pt-1">

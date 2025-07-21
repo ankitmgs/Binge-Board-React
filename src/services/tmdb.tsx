@@ -345,3 +345,48 @@ export const getTvSeasonEpisodes = async (
     return null;
   }
 };
+
+export const searchContent = async (
+  query: string,
+  page: number = 1
+): Promise<Recommendation[] | null> => {
+  try {
+    if (!query || !query.trim()) {
+      console.warn("[TMDB Service - Search] Empty or invalid query provided.");
+      return null;
+    }
+
+    const url = `${TMDB_BASE_URL}/search/multi`;
+    const params = {
+      api_key: TMDB_API_KEY,
+      language: "en-US",
+      query: query.trim(),
+      page: page.toString(),
+    };
+
+    const response = await axios.get(url, { params });
+
+    const results = response?.data?.results;
+    if (!Array.isArray(results)) {
+      console.warn(
+        `[TMDB Service - Search] No valid results array for query: "${query}"`
+      );
+      return null;
+    }
+
+    const mappedResults = results
+      .map((item) => mapTmdbItemToRecommendation(item, item.media_type))
+      .filter(Boolean)
+      .sort(
+        (a, b) => (b.popularity || 0) - (a.popularity || 0)
+      ) as Recommendation[];
+
+    return mappedResults;
+  } catch (error: any) {
+    console.error(
+      `[TMDB Service - Search] Error during search for query: "${query}"`,
+      error
+    );
+    return null;
+  }
+};
