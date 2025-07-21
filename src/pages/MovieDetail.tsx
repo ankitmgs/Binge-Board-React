@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { format, parseISO, isValid } from 'date-fns';
 import {
   getMediaCredits,
   getMediaDetails,
@@ -8,28 +7,14 @@ import {
   getTvSeasonEpisodes,
   getWatchProviders,
 } from "../services/tmdb";
-import {
-  TMDB_BACKDROP_BASE_URL,
-  TMDB_IMAGE_BASE_URL,
-} from "../constant/apiUrl";
+import { TMDB_BACKDROP_BASE_URL } from "../constant/apiUrl";
+import { Skeleton } from "../ui/skeleton";
+import SeasonsEpisodes from "../components/MovieDetail/SeasonsEpisodes";
+import GallerySection from "../components/MovieDetail/GallerySection";
+import CastSection from "../components/MovieDetail/CastSection";
+import { PlayCircle } from "lucide-react";
 import MovieDetailsGallery from "../components/MovieDetail/MovieDetailsGallery";
 import CastDetails from "../components/MovieDetail/CastDetails";
-import { Skeleton } from "../ui/skeleton";
-import { Loader2, PlayCircle } from "lucide-react";
-import { Label } from "../ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "../ui/accordion";
 
 const MovieDetail = () => {
   const { type, id } = useParams<{ type: string; id: string }>();
@@ -45,7 +30,6 @@ const MovieDetail = () => {
   } | null>(null);
 
   const [seasonEpisodes, setSeasonEpisodes] = useState<any[]>([]);
-  const [isLoadingSeasons, setIsLoadingSeasons] = useState(false);
   const [isLoadingEpisodes, setIsLoadingEpisodes] = useState(false);
   const [episodesError, setEpisodesError] = useState<string | null>(null);
   console.log("Movie ID:", movieDetails);
@@ -461,157 +445,43 @@ const MovieDetail = () => {
             </div>
           </div>
         </div>
-        {type === "tv" && (
-          <div className="mt-8 sm:mt-12">
-            <div
-              data-orientation="horizontal"
-              role="none"
-              className="shrink-0 bg-[#414158] h-[1px] w-full my-6 sm:my-8"
-            ></div>
-            <h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 text-[#9174e7]">
-              Seasons &amp; Episodes
-            </h2>
-            <div className="space-y-6">
-              <div>
-                <Label
-                  htmlFor="season-select-detail"
-                  className="text-base font-medium mb-2 block"
-                >
-                  Select a Season
-                </Label>
-                <Select
-                  value={selectedSeasonData?.season_number || ""}
-                  onValueChange={(value) => {
-                    const season = movieDetails?.seasons.find(
-                      (s) => s.season_number.toString() === value
-                    );
-
-                    const selected = season
-                      ? {
-                          season_number: season.season_number.toString(),
-                          name: season.name,
-                        }
-                      : null;
-
-                    console.log("Setting selectedSeasonData to:", selected); // 👈 Exact value
-
-                    setSelectedSeasonData(selected);
-                  }}
-                >
-                  <SelectTrigger
-                    id="season-select-detail"
-                    className="w-full md:w-1/2 lg:w-1/3 bg-[#262239] border-[#414158] hover:border-primary/50 focus:border-primary focus:ring-primary"
-                  >
-                    <SelectValue placeholder="Choose a season" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-[#262239] border-[#414158]">
-                    {movieDetails?.seasons?.map((season) => (
-                      <SelectItem
-                        key={season.id}
-                        value={season.season_number.toString()}
-                        className="hover:bg-[#719df4] focus:bg-[#719df4] hover:text-black"
-                      >
-                        {season.name} (Season {season.season_number}) -{" "}
-                        {season.episode_count} episodes
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              {selectedSeasonData && (
-                <div className="mt-4">
-                  <h3 className="text-xl sm:text-2xl font-semibold mb-3 text-[#9174e7e6]/90">
-                    Episodes for{" "}
-                    {selectedSeasonData.name ||
-                      `Season ${selectedSeasonData.season_number}`}
-                  </h3>
-                  {isLoadingEpisodes ? (
-                    <div className="flex items-center text-[#8585ad]">
-                      <Loader2 className="mr-2 h-5 w-5 animate-spin" /> Loading
-                      episodes...
-                    </div>
-                  ) : episodesError ? (
-                    <p className="text-destructive">{episodesError}</p>
-                  ) : seasonEpisodes.length > 0 ? (
-                    <Accordion type="single" collapsible className="w-full">
-                      {seasonEpisodes.map((episode) => (
-                        <AccordionItem
-                          value={`episode-${episode.id}`}
-                          key={episode.id}
-                        >
-                          <AccordionTrigger className="text-left hover:bg-[#3d3d5280]/50 px-3 py-3 rounded-md">
-                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between w-full">
-                              <span className="font-medium text-foreground">
-                                Ep {episode.episode_number}: {episode.name}
-                              </span>
-                              {episode.air_date &&
-                                isValid(parseISO(episode.air_date)) && (
-                                  <span className="text-xs text-[#8585ad] mt-1 sm:mt-0 sm:ml-4">
-                                    Aired:{" "}
-                                    {format(
-                                      parseISO(episode.air_date),
-                                      "MMM d, yyyy"
-                                    )}
-                                  </span>
-                                )}
-                            </div>
-                          </AccordionTrigger>
-                          <AccordionContent className="px-3 py-3 bg-[#3d3d5280]/30 rounded-b-md">
-                            <p className="text-sm text-[#8585ad] leading-relaxed">
-                              {episode.overview ||
-                                "No overview available for this episode."}
-                            </p>
-                            {episode.runtime !== null &&
-                              episode.runtime > 0 && (
-                                <p className="text-xs text-[#8585ad] mt-2">
-                                  Runtime: {formatRuntime(episode.runtime)}
-                                </p>
-                              )}
-                          </AccordionContent>
-                        </AccordionItem>
-                      ))}
-                    </Accordion>
-                  ) : (
-                    <p className="text-[#8585ad]">
-                      No episodes found for this season.
-                    </p>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
+        {type === "tv" && movieDetails?.seasons && (
+          <SeasonsEpisodes
+            showId={id}
+            seasons={movieDetails.seasons}
+            getTvSeasonEpisodes={getTvSeasonEpisodes}
+          />
         )}
         <div className="mt-8 sm:mt-12">
           <div
             data-orientation="horizontal"
             role="none"
             className="shrink-0 bg-[#414158] h-[1px] w-full my-6 sm:my-8"
+          ></div>
+          <h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 text-[#9174e7]">
+            Gallery
+          </h2>
+          <div
+            className="relative overflow-hidden w-full whitespace-nowrap rounded-md pb-4"
+            style={{ position: "relative" }}
           >
-            <h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 text-[#9174e7]">
-              Gallery
-            </h2>
+            <MovieDetailsGallery images={mediaImages} />
+          </div>
+          <div className="my-6 sm:my-8">
             <div
-              className="relative overflow-hidden w-full whitespace-nowrap rounded-md pb-4"
-              style={{ position: "relative" }}
-            >
-              <MovieDetailsGallery images={mediaImages} />
-            </div>
-            <div className="my-6 sm:my-8">
-              <div
-                data-orientation="horizontal"
-                role="none"
-                className="shrink-0 bg-[#414158] h-[1px] w-full"
-              ></div>
-              <h2 className="text-xl sm:text-2xl font-semibold mb-2 mt-6 text-[#9174e7]">
-                Status
-              </h2>
-              <p className="text-base md:text-lg text-[#8585ad]">
-                {movieDetails?.status || "Unknown Status"}
-              </p>
-            </div>
-            <div className="mt-8 sm:mt-12">
-              <CastDetails mediaCredits={mediaCredits} />
-            </div>
+              data-orientation="horizontal"
+              role="none"
+              className="shrink-0 bg-[#414158] h-[1px] w-full"
+            ></div>
+            <h2 className="text-xl sm:text-2xl font-semibold mb-2 mt-6 text-[#9174e7]">
+              Status
+            </h2>
+            <p className="text-base md:text-lg text-[#8585ad]">
+              {movieDetails?.status || "Unknown Status"}
+            </p>
+          </div>
+          <div className="mt-8 sm:mt-12">
+            <CastDetails mediaCredits={mediaCredits} />
           </div>
         </div>
       </main>
