@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { format, parseISO, isValid } from 'date-fns';
 import {
   getMediaCredits,
   getMediaDetails,
   getMediaImages,
+  getTvSeasonEpisodes,
   getWatchProviders,
 } from "../services/tmdb";
 import {
@@ -13,7 +15,7 @@ import {
 import MovieDetailsGallery from "../components/MovieDetail/MovieDetailsGallery";
 import CastDetails from "../components/MovieDetail/CastDetails";
 import { Skeleton } from "../ui/skeleton";
-import { PlayCircle } from "lucide-react";
+import { Loader2, PlayCircle } from "lucide-react";
 import { Label } from "../ui/label";
 import {
   Select,
@@ -22,6 +24,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "../ui/accordion";
 
 const MovieDetail = () => {
   const { type, id } = useParams<{ type: string; id: string }>();
@@ -35,6 +43,11 @@ const MovieDetail = () => {
     season_number: string;
     name: string;
   } | null>(null);
+
+  const [seasonEpisodes, setSeasonEpisodes] = useState<any[]>([]);
+  const [isLoadingSeasons, setIsLoadingSeasons] = useState(false);
+  const [isLoadingEpisodes, setIsLoadingEpisodes] = useState(false);
+  const [episodesError, setEpisodesError] = useState<string | null>(null);
   console.log("Movie ID:", movieDetails);
 
   const getMoviesDetails = async () => {
@@ -94,6 +107,34 @@ const MovieDetail = () => {
       getWatchProvidersAPI(),
     ]).finally(() => setLoading(false));
   }, [type, id]);
+
+  useEffect(() => {
+    if (selectedSeasonData?.season_number && type === "tv" && id) {
+      setIsLoadingEpisodes(true);
+      setEpisodesError(null);
+      setSeasonEpisodes([]);
+      
+      getTvSeasonEpisodes(id, parseInt(selectedSeasonData.season_number, 10))
+      .then((episodes) => {
+        console.log(
+          "Episodes for season:",
+          selectedSeasonData.season_number,
+          episodes
+        );
+        setSeasonEpisodes(episodes?.episodes);
+        })
+        .catch((err) => {
+          console.error(
+            `Error fetching episodes for season ${selectedSeasonData.season_number}:`,
+            err
+          );
+          setEpisodesError("Could not load episodes for this season.");
+        })
+        .finally(() => setIsLoadingEpisodes(false));
+    } else {
+      setSeasonEpisodes([]);
+    }
+  }, [selectedSeasonData, id, type]);
 
   function formatDateToReadable(dateString: string = ""): string {
     const date = new Date(dateString);
@@ -298,7 +339,7 @@ const MovieDetail = () => {
                   {movieDetails?.runtime && (
                     <span>{formatRuntime(movieDetails?.runtime)}</span>
                   )}
-                  {movieDetails?.episode_run_time[0] && (
+                  {movieDetails?.episode_run_time && (
                     <span>{movieDetails?.episode_run_time}m</span>
                   )}
                 </div>
@@ -386,7 +427,7 @@ const MovieDetail = () => {
                       key={provider.provider_id}
                       href={
                         watchProviders?.link ||
-                        `https://www.themoviedb.org/${mediaType}/${id}/watch?locale=IN`
+                        `https://www.themoviedb.org/${type}/${id}/watch?locale=IN`
                       }
                       target="_blank"
                       rel="noopener noreferrer"
@@ -403,7 +444,7 @@ const MovieDetail = () => {
                         />
                       ) : (
                         <div
-                          className="h-10 w-10 flex items-center justify-center text-muted-foreground"
+                          className="h-10 w-10 flex items-center justify-center text-[#8585ad]"
                           title={provider.provider_name}
                         >
                           <PlayCircle className="h-8 w-8" />
@@ -444,14 +485,17 @@ const MovieDetail = () => {
                     const season = movieDetails?.seasons.find(
                       (s) => s.season_number.toString() === value
                     );
-                    setSelectedSeasonData(
-                      season
-                        ? {
-                            season_number: season.season_number.toString(),
-                            name: season.name,
-                          }
-                        : null
-                    );
+
+                    const selected = season
+                      ? {
+                          season_number: season.season_number.toString(),
+                          name: season.name,
+                        }
+                      : null;
+
+                    console.log("Setting selectedSeasonData to:", selected); // 👈 Exact value
+
+                    setSelectedSeasonData(selected);
                   }}
                 >
                   <SelectTrigger
@@ -474,6 +518,66 @@ const MovieDetail = () => {
                   </SelectContent>
                 </Select>
               </div>
+              {selectedSeasonData && (
+                <div className="mt-4">
+                  <h3 className="text-xl sm:text-2xl font-semibold mb-3 text-[#9174e7e6]/90">
+                    Episodes for{" "}
+                    {selectedSeasonData.name ||
+                      `Season ${selectedSeasonData.season_number}`}
+                  </h3>
+                  {isLoadingEpisodes ? (
+                    <div className="flex items-center text-[#8585ad]">
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin" /> Loading
+                      episodes...
+                    </div>
+                  ) : episodesError ? (
+                    <p className="text-destructive">{episodesError}</p>
+                  ) : seasonEpisodes.length > 0 ? (
+                    <Accordion type="single" collapsible className="w-full">
+                      {seasonEpisodes.map((episode) => (
+                        <AccordionItem
+                          value={`episode-${episode.id}`}
+                          key={episode.id}
+                        >
+                          <AccordionTrigger className="text-left hover:bg-[#3d3d5280]/50 px-3 py-3 rounded-md">
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between w-full">
+                              <span className="font-medium text-foreground">
+                                Ep {episode.episode_number}: {episode.name}
+                              </span>
+                              {episode.air_date &&
+                                isValid(parseISO(episode.air_date)) && (
+                                  <span className="text-xs text-[#8585ad] mt-1 sm:mt-0 sm:ml-4">
+                                    Aired:{" "}
+                                    {format(
+                                      parseISO(episode.air_date),
+                                      "MMM d, yyyy"
+                                    )}
+                                  </span>
+                                )}
+                            </div>
+                          </AccordionTrigger>
+                          <AccordionContent className="px-3 py-3 bg-[#3d3d5280]/30 rounded-b-md">
+                            <p className="text-sm text-[#8585ad] leading-relaxed">
+                              {episode.overview ||
+                                "No overview available for this episode."}
+                            </p>
+                            {episode.runtime !== null &&
+                              episode.runtime > 0 && (
+                                <p className="text-xs text-[#8585ad] mt-2">
+                                  Runtime: {formatRuntime(episode.runtime)}
+                                </p>
+                              )}
+                          </AccordionContent>
+                        </AccordionItem>
+                      ))}
+                    </Accordion>
+                  ) : (
+                    <p className="text-[#8585ad]">
+                      No episodes found for this season.
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         )}
