@@ -10,11 +10,10 @@ import {
 import { TMDB_BACKDROP_BASE_URL } from "../constant/apiUrl";
 import { Skeleton } from "../ui/skeleton";
 import SeasonsEpisodes from "../components/MovieDetail/SeasonsEpisodes";
-import GallerySection from "../components/MovieDetail/GallerySection";
-import CastSection from "../components/MovieDetail/CastSection";
 import { PlayCircle } from "lucide-react";
 import MovieDetailsGallery from "../components/MovieDetail/MovieDetailsGallery";
 import CastDetails from "../components/MovieDetail/CastDetails";
+import AddMovieListModal from "../components/Modals/AddMovieListModal";
 
 const MovieDetail = () => {
   const { type, id } = useParams<{ type: string; id: string }>();
@@ -23,6 +22,7 @@ const MovieDetail = () => {
   const [mediaCredits, setMediaCredits] = useState([]);
   const [watchProviders, setWatchProviders] = useState<null | any>(null);
   const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedSeasonData, setSelectedSeasonData] = useState<{
     season_number: string;
@@ -352,6 +352,7 @@ const MovieDetail = () => {
             <button
               className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 border border-input bg-[#181528] hover:bg-accent hover:text-accent-foreground h-10 w-full md:w-auto mt-4 py-3 px-6 text-base border border-[1px] border-[#363649]"
               aria-pressed="false"
+              onClick={() => setShowModal(true)}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -484,6 +485,9 @@ const MovieDetail = () => {
             <CastDetails mediaCredits={mediaCredits} />
           </div>
         </div>
+        {showModal && (
+          <AddMovieListModal onClose={() => setShowModal(false)} title={movieDetails?.title || movieDetails?.name} />
+        )}
       </main>
     </div>
   );
