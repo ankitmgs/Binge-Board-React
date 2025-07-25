@@ -1,11 +1,14 @@
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import BackgroundImage from "../assets/default.png";
 import type { RootState } from "../store";
 import { Button } from "../ui/button";
 import { Edit } from "lucide-react";
 import { Link } from "react-router-dom";
+import CreateListModal from "../components/Modals/CreateListModal";
 
 const Profile = () => {
+  const [showCreateListModal, setShowCreateListModal] = useState(false);
   const user = useSelector((state: RootState) => state.user) as {
     uid: string | null;
     email?: string | null;
@@ -128,7 +131,10 @@ const Profile = () => {
                   </svg>
                 </button>
                 {userHaveList && (
-                  <button className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-[#9174e7] text-[#161221] hover:bg-[#9174e7]/90 px-4 py-2 h-10">
+                  <button
+                    className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-[#9174e7] text-[#161221] hover:bg-[#9174e7]/90 px-4 py-2 h-10"
+                    onClick={() => setShowCreateListModal(true)}
+                  >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="24"
@@ -374,7 +380,10 @@ const Profile = () => {
                 <p className="text-[#8585ad] text-sm sm:text-base mb-8">
                   Start organizing your favorite movies and shows!
                 </p>
-                <button className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-[#9174e7] text-[#161221] hover:bg-[#9174e7]/90 h-11 rounded-md px-8">
+                <button
+                  className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-[#9174e7] text-[#161221] hover:bg-[#9174e7]/90 h-11 rounded-md px-8"
+                  onClick={() => setShowCreateListModal(true)}
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="24"
@@ -398,6 +407,9 @@ const Profile = () => {
           </div>
         </div>
       </div>
+      {showCreateListModal && (
+        <CreateListModal onClose={() => setShowCreateListModal(false)} />
+      )}
     </main>
   );
 };
