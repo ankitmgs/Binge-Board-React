@@ -12,6 +12,11 @@ import {
 import { Button } from "../..//ui/button";
 import { Input } from "../..//ui/input";
 import { Label } from "../..//ui/label";
+import { useDispatch } from "react-redux";
+import type { AppDispatch } from "../../redux/store";
+import { editList } from "../../redux/rtk-apis/editList";
+import { toast } from "react-toastify";
+import { getAllList } from "../../redux/rtk-apis/getList";
 
 interface RenameListDialogProps {
   isOpen: boolean;
@@ -26,7 +31,8 @@ export function RenameListDialog({
   list,
 }: RenameListDialogProps) {
   const [error, setError] = useState("");
-  const [newListName, setNewListName] = useState("")
+  const [newListName, setNewListName] = useState("");
+  const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
     if (isOpen) {
@@ -37,12 +43,14 @@ export function RenameListDialog({
 
   if (!isOpen) return null;
 
-  const hanldeRename = () => {
-    console.log("This is edited list", list);
-    console.log("This is new name", newListName);
-    
-    
-  }
+  const hanldeRename = async () => {
+    await dispatch(
+      editList({ listId: list._id, payload: { name: newListName } })
+    ).then((res) => {
+      toast.success(res.payload || "Editing Success...");
+      dispatch(getAllList());
+    });
+  };
 
   return (
     <Dialog
