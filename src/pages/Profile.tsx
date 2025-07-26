@@ -1,11 +1,12 @@
-import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { getAllList } from "../redux/rtk-apis/getList";
 import BackgroundImage from "../assets/default.png";
-import type { RootState } from "../store";
 import { Button } from "../ui/button";
 import { Edit } from "lucide-react";
 import { Link } from "react-router-dom";
 import CreateListModal from "../components/Modals/CreateListModal";
+import type { AppDispatch, RootState } from "../redux/store";
 
 const Profile = () => {
   const [showCreateListModal, setShowCreateListModal] = useState(false);
@@ -15,7 +16,24 @@ const Profile = () => {
     displayName?: string | null;
     photoURL?: string | null;
   };
-  const userHaveList = true;
+  const listsResponse = useSelector((state: RootState) => state.getAllList);
+  const dispatch = useDispatch<AppDispatch>();
+
+  const isListDataPresent =
+    listsResponse &&
+    listsResponse.lists &&
+    Array.isArray(listsResponse.lists) &&
+    listsResponse.lists.length > 0;
+
+  useEffect(() => {
+    console.log("listsResponse", listsResponse);
+  }, [listsResponse]);
+
+  useEffect(() => {
+    if (!isListDataPresent) {
+      dispatch(getAllList());
+    }
+  }, [isListDataPresent, dispatch]);
 
   return (
     <main className="mt-16 pb-8">
@@ -38,7 +56,7 @@ const Profile = () => {
         <div className="bg-[#262239] p-4 sm:p-6 rounded-lg shadow-xl relative -mt-10 md:-mt-16 mx-auto max-w-4xl border-border/30">
           <Link to="/settings">
             <button
-              className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 hover:bg-[#719df4] absolute top-3 right-3 sm:top-4 sm:right-4 h-8 w-8 text-[#8585ad] hover:text-[#9174e7] z-20 hover:bg-[#9174e7]"
+              className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 absolute top-3 right-3 sm:top-4 sm:right-4 h-8 w-8 text-[#8585ad] hover:text-[#9174e7] z-20 hover:bg-[#9174e7]"
               title="Go to Settings"
             >
               <svg
@@ -130,7 +148,7 @@ const Profile = () => {
                     <path d="M6 12v6"></path>
                   </svg>
                 </button>
-                {userHaveList && (
+                {listsResponse?.lists?.length && (
                   <button
                     className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-[#9174e7] text-[#161221] hover:bg-[#9174e7]/90 px-4 py-2 h-10"
                     onClick={() => setShowCreateListModal(true)}
@@ -156,7 +174,7 @@ const Profile = () => {
                 )}
               </div>
             </div>
-            {userHaveList ? (
+            {listsResponse?.lists?.length ? (
               <div>
                 <div className="mb-6">
                   <label className="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-sm font-medium">
@@ -208,150 +226,155 @@ const Profile = () => {
                   </button>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  <div
-                    className="rounded-lg text-card-foreground shadow-sm flex flex-col justify-between bg-[#262239]/80 hover:shadow-[#9174e7]/20 transition-shadow duration-300 ease-in-out transform hover:-translate-y-1 "
-                    style={{ border: "1px solid #414158" }}
-                  >
-                    <div className="flex flex-col space-y-1.5 cursor-pointer group hover:bg-[#3d3d524d]/30 transition-colors p-4">
-                      <div className="flex justify-between items-start">
-                        <Link
-                          className="block flex-grow outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm min-w-0 group-hover:text-[#9174e7] transition-colors"
-                          to="/me/list/list-1753170914309-xxjutvl"
-                        >
-                          <div className="tracking-tight text-lg sm:text-xl font-semibold break-words">
-                            test
+                  {(listsResponse?.lists || []).map((item, index) => {
+                    return (
+                      <div
+                        key={index}
+                        className="rounded-lg text-card-foreground shadow-sm flex flex-col justify-between bg-[#262239]/80 hover:shadow-[#9174e7]/20 transition-shadow duration-300 ease-in-out transform hover:-translate-y-1 "
+                        style={{ border: "1px solid #414158" }}
+                      >
+                        <div className="flex flex-col space-y-1.5 cursor-pointer group hover:bg-[#3d3d524d]/30 transition-colors p-4">
+                          <div className="flex justify-between items-start">
+                            <Link
+                              className="block flex-grow outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm min-w-0 group-hover:text-[#9174e7] transition-colors"
+                              to="/me/list/list-1753170914309-xxjutvl"
+                            >
+                              <div className="tracking-tight text-lg sm:text-xl font-semibold break-words">
+                                {item?.name || "List Name"}
+                              </div>
+                              <div className="text-[#8585ad] text-xs group-hover:text-[#9174e7]/80 transition-colors mt-0.5">
+                                1 item
+                              </div>
+                            </Link>
+                            <button
+                              className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 hover:bg-[#719df4] text-[#8585ad] hover:text-[#9174e7] flex-shrink-0 ml-2 h-8 w-8"
+                              data-action-button="true"
+                              title="Pin list"
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                className="lucide lucide-pin h-4 w-4"
+                              >
+                                <path d="M12 17v5"></path>
+                                <path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"></path>
+                              </svg>
+                              <span className="sr-only">Pin list</span>
+                            </button>
                           </div>
-                          <div className="text-[#8585ad] text-xs group-hover:text-[#9174e7]/80 transition-colors mt-0.5">
-                            1 item
-                          </div>
-                        </Link>
-                        <button
-                          className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 hover:bg-[#719df4] text-[#8585ad] hover:text-[#9174e7] flex-shrink-0 ml-2 h-8 w-8"
-                          data-action-button="true"
-                          title="Pin list"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className="lucide lucide-pin h-4 w-4"
+                        </div>
+                        <div className="flex justify-end items-center gap-1 p-3 border-t border-border/50">
+                          <button
+                            className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 hover:bg-[#719df4] hover:text-[#121721] h-8 w-8"
+                            data-action-button="true"
+                            title="Export list"
                           >
-                            <path d="M12 17v5"></path>
-                            <path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"></path>
-                          </svg>
-                          <span className="sr-only">Pin list</span>
-                        </button>
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="24"
+                              height="24"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              className="lucide lucide-share2 h-4 w-4 text-[#8585ad] hover:text-[#9174e7]"
+                            >
+                              <circle cx="18" cy="5" r="3"></circle>
+                              <circle cx="6" cy="12" r="3"></circle>
+                              <circle cx="18" cy="19" r="3"></circle>
+                              <line
+                                x1="8.59"
+                                x2="15.42"
+                                y1="13.51"
+                                y2="17.49"
+                              ></line>
+                              <line
+                                x1="15.41"
+                                x2="8.59"
+                                y1="6.51"
+                                y2="10.49"
+                              ></line>
+                            </svg>
+                            <span className="sr-only">Export list</span>
+                          </button>
+                          <button
+                            className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 hover:bg-[#719df4] hover:text-[#121721] h-8 w-8"
+                            data-action-button="true"
+                            title="Rename list"
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="24"
+                              height="24"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              className="lucide lucide-pen-line h-4 w-4 text-[#8585ad] hover:text-[#9174e7]"
+                            >
+                              <path d="M12 20h9"></path>
+                              <path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z"></path>
+                            </svg>
+                            <span className="sr-only">Rename list</span>
+                          </button>
+                          <button
+                            className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 text-[#8585ad] hover:text-[#d74242] hover:bg-[#d74242]/10 h-8 w-8"
+                            data-action-button="true"
+                            title="Delete list"
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="24"
+                              height="24"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              className="lucide lucide-trash2 h-4 w-4"
+                            >
+                              <path d="M3 6h18"></path>
+                              <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                              <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                              <line x1="10" x2="10" y1="11" y2="17"></line>
+                              <line x1="14" x2="14" y1="11" y2="17"></line>
+                            </svg>
+                            <span className="sr-only">Delete list</span>
+                          </button>
+                          <button className="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 border border-input bg-background hover:bg-[#719df4] hover:text-[#121721] rounded-md h-8 px-2 text-xs">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="24"
+                              height="24"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              className="lucide lucide-eye mr-1.5 h-3.5 w-3.5"
+                            >
+                              <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"></path>
+                              <circle cx="12" cy="12" r="3"></circle>
+                            </svg>{" "}
+                            View
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                    <div className="flex justify-end items-center gap-1 p-3 border-t border-border/50">
-                      <button
-                        className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 hover:bg-[#719df4] hover:text-[#121721] h-8 w-8"
-                        data-action-button="true"
-                        title="Export list"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="lucide lucide-share2 h-4 w-4 text-[#8585ad] hover:text-[#9174e7]"
-                        >
-                          <circle cx="18" cy="5" r="3"></circle>
-                          <circle cx="6" cy="12" r="3"></circle>
-                          <circle cx="18" cy="19" r="3"></circle>
-                          <line
-                            x1="8.59"
-                            x2="15.42"
-                            y1="13.51"
-                            y2="17.49"
-                          ></line>
-                          <line
-                            x1="15.41"
-                            x2="8.59"
-                            y1="6.51"
-                            y2="10.49"
-                          ></line>
-                        </svg>
-                        <span className="sr-only">Export list</span>
-                      </button>
-                      <button
-                        className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 hover:bg-[#719df4] hover:text-[#121721] h-8 w-8"
-                        data-action-button="true"
-                        title="Rename list"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="lucide lucide-pen-line h-4 w-4 text-[#8585ad] hover:text-[#9174e7]"
-                        >
-                          <path d="M12 20h9"></path>
-                          <path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z"></path>
-                        </svg>
-                        <span className="sr-only">Rename list</span>
-                      </button>
-                      <button
-                        className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 text-[#8585ad] hover:text-[#d74242] hover:bg-[#d74242]/10 h-8 w-8"
-                        data-action-button="true"
-                        title="Delete list"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="lucide lucide-trash2 h-4 w-4"
-                        >
-                          <path d="M3 6h18"></path>
-                          <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
-                          <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
-                          <line x1="10" x2="10" y1="11" y2="17"></line>
-                          <line x1="14" x2="14" y1="11" y2="17"></line>
-                        </svg>
-                        <span className="sr-only">Delete list</span>
-                      </button>
-                      <button className="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 border border-input bg-background hover:bg-[#719df4] hover:text-[#121721] rounded-md h-8 px-2 text-xs">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="lucide lucide-eye mr-1.5 h-3.5 w-3.5"
-                        >
-                          <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"></path>
-                          <circle cx="12" cy="12" r="3"></circle>
-                        </svg>{" "}
-                        View
-                      </button>
-                    </div>
-                  </div>
+                    );
+                  })}
                 </div>
               </div>
             ) : (

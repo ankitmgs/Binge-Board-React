@@ -6,11 +6,11 @@ import { toast } from "react-toastify";
 import { Sun, Moon, Search } from "lucide-react";
 import { onAuthStateChanged } from "../../services/firebase";
 import { useSelector, useDispatch } from "react-redux";
-import type { RootState } from "../../store";
 import { Button } from "../../ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "../../ui/avatar";
 import { getInitials } from "../../helper";
 import { clearUser } from "../../redux/slices/userSlice";
+import type { RootState } from "../../redux/store";
 
 const Header = () => {
   const navigate = useNavigate();

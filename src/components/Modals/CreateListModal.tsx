@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
 import { addList } from "../../redux/rtk-apis/addList";
-import { useAppDispatch } from "../../hooks/useAppDispatch";
+import type { AppDispatch } from "../../redux/store";
 
 interface CreateListModalProps {
   onClose?: () => void;
@@ -12,7 +12,7 @@ const CreateListModal: React.FC<CreateListModalProps> = ({ onClose }) => {
   const [listName, setListName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const dispatch = useAppDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const modalRef = useRef<HTMLDivElement>(null);
   const [animateIn, setAnimateIn] = useState(false);
 

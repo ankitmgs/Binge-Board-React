@@ -2,12 +2,17 @@ import { useEffect, useState } from "react";
 import { HeroBanner } from "../components/banner/HeroBanner";
 import HomeMoviesSection from "../components/homeMovies";
 import { getNowPlayingMovies } from "../services/tmdb";
+import { useDispatch } from "react-redux";
+import type { AppDispatch } from "../redux/store";
+import { getAllList } from "../redux/rtk-apis/getList";
 
 function Home() {
   const [item, setItem] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-
+  const dispatch = useDispatch<AppDispatch>();
+  
   useEffect(() => {
+    dispatch(getAllList());
     getNowPlayingMovies().then((data) => {
       if (Array.isArray(data)) {
         setItem(data);
