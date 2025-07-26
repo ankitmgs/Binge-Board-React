@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
+import { addList } from "../../services/api";
+import { toast } from "react-toastify";
 
 interface CreateListModalProps {
   onClose?: () => void;
 }
 
-const CreateListModal: React.FC<CreateListModalProps> = ({
-  onClose,
-}) => {
+const CreateListModal: React.FC<CreateListModalProps> = ({ onClose }) => {
   const modalRef = useRef<HTMLDivElement>(null);
   const [animateIn, setAnimateIn] = useState(false);
   const [listName, setListName] = useState("");
@@ -49,12 +49,15 @@ const CreateListModal: React.FC<CreateListModalProps> = ({
     setLoading(true);
     setError(null);
     try {
-      // TODO: Replace with your API call
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API
+      const result = await addList(listName);
+      if (result?.status === 201) {
+        toast.success("List created successfully!");
+      }
       setListName("");
       onClose?.();
     } catch (e) {
       setError("Failed to create list. Please try again.");
+      toast.error("Failed to create list. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -63,7 +66,10 @@ const CreateListModal: React.FC<CreateListModalProps> = ({
   return (
     <>
       {/* Overlay */}
-      <div className="fixed inset-0 z-40 bg-[#000c] bg-opacity-70 transition-opacity" style={{ pointerEvents: "auto" }} />
+      <div
+        className="fixed inset-0 z-40 bg-[#000c] bg-opacity-70 transition-opacity"
+        style={{ pointerEvents: "auto" }}
+      />
       {/* Modal with animation */}
       <div
         ref={modalRef}
@@ -72,7 +78,9 @@ const CreateListModal: React.FC<CreateListModalProps> = ({
         aria-describedby="radix-«r2»"
         aria-labelledby="radix-«r1»"
         data-state="open"
-        className={`fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 bg-[#181528] p-6 shadow-lg sm:rounded-lg sm:max-w-md transition-all duration-300 ease-out ${animateIn ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}
+        className={`fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 bg-[#181528] p-6 shadow-lg sm:rounded-lg sm:max-w-md transition-all duration-300 ease-out ${
+          animateIn ? "opacity-100 scale-100" : "opacity-0 scale-90"
+        }`}
         tabIndex={-1}
         style={{ pointerEvents: "auto", border: "1px solid #414158" }}
       >
@@ -96,11 +104,15 @@ const CreateListModal: React.FC<CreateListModalProps> = ({
               placeholder="e.g., My Awesome Movies"
               aria-label="List name"
               value={listName}
-              onChange={e => setListName(e.target.value)}
+              onChange={(e) => setListName(e.target.value)}
               disabled={loading}
             />
           </div>
-          {error && <p className="text-red-500 col-span-4 text-sm text-destructive text-center">{error}</p>}
+          {error && (
+            <p className="text-red-500 col-span-4 text-sm text-destructive text-center">
+              {error}
+            </p>
+          )}
         </div>
         <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
           <button

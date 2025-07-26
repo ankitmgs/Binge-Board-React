@@ -350,7 +350,7 @@ const MovieDetail = () => {
               </div>
             </div>
             <button
-              className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 border border-input bg-[#181528] hover:bg-accent hover:text-accent-foreground h-10 w-full md:w-auto mt-4 py-3 px-6 text-base border border-[1px] border-[#363649]"
+              className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 border border-input bg-[#181528] hover:bg-[#719df4] hover:text-black h-10 w-full md:w-auto mt-4 py-3 px-6 text-base border border-[1px] border-[#363649]"
               aria-pressed="false"
               onClick={() => setShowModal(true)}
             >
