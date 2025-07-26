@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
 import { addList } from "../../redux/rtk-apis/addList";
 import type { AppDispatch } from "../../redux/store";
+import { getAllList } from "../../redux/rtk-apis/getList";
 
 interface CreateListModalProps {
   onClose?: () => void;
@@ -64,6 +65,7 @@ const CreateListModal: React.FC<CreateListModalProps> = ({ onClose }) => {
       toast.success("List created successfully!");
       setListName("");
       onClose?.();
+      dispatch(getAllList());
     } catch (error) {
       setError("Failed to create list. Please try again.");
       toast.error("Failed to create list. Please try again.");
