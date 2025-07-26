@@ -8,6 +8,7 @@ import { getAllList } from "../../redux/rtk-apis/getList";
 import { useState } from "react";
 import { DeleteListConfirmationDialog } from "../Modals/DeleteListConfimationModal";
 import { toast } from "react-toastify";
+import { RenameListDialog } from "../Modals/RenameListModal";
 
 interface List {
   _id: string;
@@ -20,19 +21,17 @@ const MyList = ({ listsResponse, setShowCreateListModal }: any) => {
     isOpen: false,
     onConfirm: null,
   });
+  const [renameConfimmation, setRenameConfimmation] = useState({
+    list: "",
+    isOpen: false,
+    onConfirm: null,
+  });
   const dispatch = useDispatch<AppDispatch>();
-  const handleUpdateList = (id: string) => {
-    console.log("Id ", id);
-  };
 
   const handleDeleteList = async (id: string) => {
-    console.log("Id", id);
     await dispatch(deleteList(id)).then((res) => {
-      console.log("Res", res);
-      
-      toast.success(res?.payload?.msg || "List Deleted...")
+      toast.success(res?.payload?.msg || "List Deleted...");
       dispatch(getAllList());
-
     });
   };
   return (
@@ -163,7 +162,12 @@ const MyList = ({ listsResponse, setShowCreateListModal }: any) => {
                       className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 hover:bg-[#719df4] hover:text-[#121721] h-8 w-8"
                       data-action-button="true"
                       title="Rename list"
-                      onClick={() => handleUpdateList(item?._id)}
+                      onClick={() =>
+                        setRenameConfimmation({
+                          isOpen: true,
+                          list: item,
+                        })
+                      }
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -186,7 +190,6 @@ const MyList = ({ listsResponse, setShowCreateListModal }: any) => {
                       className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 text-[#8585ad] hover:text-[#d74242] hover:bg-[#d74242]/10 h-8 w-8"
                       data-action-button="true"
                       title="Delete list"
-                      //   onClick={() => handleDeleteList(item?._id)}
                       onClick={() =>
                         setDeleteConfimation({
                           title: item?.name,
@@ -297,6 +300,15 @@ const MyList = ({ listsResponse, setShowCreateListModal }: any) => {
           }
           listName={deleteConfimation?.title}
           onConfirm={deleteConfimation.onConfirm}
+        />
+      )}
+      {renameConfimmation.isOpen && (
+        <RenameListDialog
+          isOpen={renameConfimmation.isOpen}
+          onClose={() =>
+            setRenameConfimmation((prev) => ({ ...prev, isOpen: false }))
+          }
+          list={renameConfimmation.list}
         />
       )}
     </div>
