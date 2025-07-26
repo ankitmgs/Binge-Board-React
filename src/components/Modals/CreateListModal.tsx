@@ -1,17 +1,20 @@
 import React, { useEffect, useRef, useState } from "react";
-import { addList } from "../../services/api";
+// import { addList } from "../../services/api";
 import { toast } from "react-toastify";
+import { useDispatch } from "react-redux";
+import { addList } from "../../redux/rtk-apis/addList";
+import { useAppDispatch } from "../../hooks/useAppDispatch";
 
 interface CreateListModalProps {
   onClose?: () => void;
 }
-
 const CreateListModal: React.FC<CreateListModalProps> = ({ onClose }) => {
-  const modalRef = useRef<HTMLDivElement>(null);
-  const [animateIn, setAnimateIn] = useState(false);
   const [listName, setListName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const dispatch = useAppDispatch();
+  const modalRef = useRef<HTMLDivElement>(null);
+  const [animateIn, setAnimateIn] = useState(false);
 
   // Animation trigger on mount
   useEffect(() => {
@@ -46,16 +49,22 @@ const CreateListModal: React.FC<CreateListModalProps> = ({ onClose }) => {
       setError("List name cannot be empty.");
       return;
     }
+
     setLoading(true);
     setError(null);
+
+    const payload = {
+      name: listName,
+      userId: localStorage.getItem("uid"),
+      isPin: false,
+    };
+
     try {
-      const result = await addList(listName);
-      if (result?.status === 201) {
-        toast.success("List created successfully!");
-      }
+      await dispatch(addList(payload)).unwrap();
+      toast.success("List created successfully!");
       setListName("");
       onClose?.();
-    } catch (e) {
+    } catch (error) {
       setError("Failed to create list. Please try again.");
       toast.error("Failed to create list. Please try again.");
     } finally {
