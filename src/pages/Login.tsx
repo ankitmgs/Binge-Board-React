@@ -17,7 +17,7 @@ import {
 import { toast } from 'react-toastify';
 import Google_logo from '../assets/google_logo.svg';
 import { useDispatch } from 'react-redux';
-import { setUser } from '../userSlice';
+import { setUser } from '../redux/slices/userSlice';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');

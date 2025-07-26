@@ -7,10 +7,10 @@ import { Sun, Moon, Search } from "lucide-react";
 import { onAuthStateChanged } from "../../services/firebase";
 import { useSelector, useDispatch } from "react-redux";
 import type { RootState } from "../../store";
-import { clearUser } from "../../userSlice";
 import { Button } from "../../ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "../../ui/avatar";
 import { getInitials } from "../../helper";
+import { clearUser } from "../../redux/slices/userSlice";
 
 const Header = () => {
   const navigate = useNavigate();

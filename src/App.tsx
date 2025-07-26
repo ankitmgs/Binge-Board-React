@@ -16,7 +16,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { onAuthStateChanged, auth } from "./services/firebase";
 import { useDispatch } from "react-redux";
-import { setUser, clearUser } from "./userSlice";
+import { setUser, clearUser } from "./redux/slices/userSlice";
 import MovieDetail from "./pages/MovieDetail";
 import Search from "./pages/Search";
 
