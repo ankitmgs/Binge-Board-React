@@ -1,10 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
 import { CirclePlusIcon, XIcon } from "../../assets/icons";
 import { Star } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import type { AppDispatch, RootState } from "../../redux/store";
+import { getAllList } from "../../redux/rtk-apis/getList";
+import { toast } from "react-toastify";
 
 interface AddMovieListModalProps {
   onClose?: () => void;
-  title?: string;
+  movieDetails?: Movie;
   disabled?: boolean;
 }
 
@@ -13,7 +17,7 @@ const starSize = "h-6 w-6";
 
 const AddMovieListModal: React.FC<AddMovieListModalProps> = ({
   onClose,
-  title = "Movie",
+  movieDetails,
   disabled = false,
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
@@ -21,17 +25,17 @@ const AddMovieListModal: React.FC<AddMovieListModalProps> = ({
   const [currentRating, setCurrentRating] = useState<number | null>(null);
   const [hoverRating, setHoverRating] = useState<number | null>(null);
   const [selectedLists, setSelectedLists] = useState<string[]>([]);
-
-  // Dummy lists for UI
-  const lists = [
-    { id: "list-1", name: "test 1", items: 1 },
-    { id: "list-2", name: "test 2", items: 13 },
-    { id: "list-3", name: "test 3", items: 16 },
-    // Add more lists as needed
-  ];
+  const { lists, isLoading }: any = useSelector(
+    (state: RootState) => state.getAllList
+  );
+  const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
     setAnimateIn(true);
+    if (!lists.length) {
+      console.log("No List found recalling lists");
+      dispatch(getAllList());
+    }
   }, []);
 
   useEffect(() => {
@@ -62,6 +66,29 @@ const AddMovieListModal: React.FC<AddMovieListModalProps> = ({
     }
   }
 
+  const handleSave = () => {
+    if (!currentRating) {
+      toast.warn("Please add some rating...");
+      return;
+    }
+
+    if (!selectedLists || selectedLists.length === 0) {
+      toast.warn("Please select at least one list to add.");
+      return;
+    }
+
+    if (!movieDetails) {
+      console.error("Movie details not found.");
+      return;
+    }
+    const newMovieDetails = { ...movieDetails, userRating: currentRating };
+    const obj = {
+      selectedLists,
+      newMovieDetails,
+    };
+    console.log("Obj", obj);
+  };
+
   function handleClearRating() {
     setCurrentRating(null);
     setHoverRating(null);
@@ -87,7 +114,7 @@ const AddMovieListModal: React.FC<AddMovieListModalProps> = ({
       >
         <div className="flex flex-col space-y-1.5 text-center sm:text-left">
           <h2 className="text-lg font-semibold leading-none tracking-tight">
-            Manage "{title}" in Lists
+            Manage "{movieDetails?.title || "Movie Name"}" in Lists
           </h2>
         </div>
         <div className="my-4 space-y-4">
@@ -219,35 +246,43 @@ const AddMovieListModal: React.FC<AddMovieListModalProps> = ({
               >
                 <div style={{ minWidth: "100%", display: "table" }}>
                   <div className="space-y-1 p-2">
-                    {lists.map((list) => (
-                      <div
-                        key={list.id}
-                        className="flex items-center space-x-3 p-2 hover:bg-muted/50 rounded-md"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={selectedLists.includes(list.id)}
-                          onChange={(e) => {
-                            setSelectedLists((sel) =>
-                              e.target.checked
-                                ? [...sel, list.id]
-                                : sel.filter((id) => id !== list.id)
-                            );
-                          }}
-                          className="peer h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
-                          id={`list-checkbox-${list.id}`}
-                        />
-                        <label
-                          htmlFor={`list-checkbox-${list.id}`}
-                          className="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-sm font-normal flex-grow cursor-pointer"
-                        >
-                          {list.name}{" "}
-                          <span className="text-xs text-muted-foreground">
-                            ({list.items} items)
-                          </span>
-                        </label>
-                      </div>
-                    ))}
+                    {!isLoading &&
+                      lists.map(
+                        (list: {
+                          _id: string;
+                          name: string;
+                          isPin: boolean;
+                        }) => (
+                          <div
+                            key={list._id}
+                            className="flex items-center space-x-3 p-2 hover:bg-muted/50 rounded-md"
+                          >
+                            <input
+                              type="checkbox"
+                              checked={selectedLists.includes(list._id)}
+                              onChange={(e) => {
+                                setSelectedLists((sel) =>
+                                  e.target.checked
+                                    ? [...sel, list._id]
+                                    : sel.filter((id) => id !== list._id)
+                                );
+                              }}
+                              className="peer h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
+                              id={`list-checkbox-${list._id}`}
+                            />
+                            <label
+                              htmlFor={`list-checkbox-${list._id}`}
+                              className="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-sm font-normal flex-grow cursor-pointer"
+                            >
+                              {list.name}{" "}
+                              <span className="text-xs text-muted-foreground">
+                                (0 items)
+                              </span>
+                            </label>
+                          </div>
+                        )
+                      )}
+                    {isLoading && <ListSkeleton />}
                   </div>
                 </div>
               </div>
@@ -271,6 +306,7 @@ const AddMovieListModal: React.FC<AddMovieListModalProps> = ({
               <button
                 className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
                 type="button"
+                onClick={() => handleSave()}
               >
                 Save
               </button>
@@ -291,3 +327,93 @@ const AddMovieListModal: React.FC<AddMovieListModalProps> = ({
 };
 
 export default AddMovieListModal;
+
+const ListSkeleton = () => {
+  return (
+    <div>
+      <div className="flex items-center space-x-3 p-2 bg-[#3d3d5280] animate-pulse rounded-md">
+        <div className="peer h-4 w-4 shrink-0 rounded-sm bg-[#3d3d5280]"></div>
+        <div className="peer-disabled:text-gray-500 peer-disabled:opacity-70 text-sm font-normal flex-grow">
+          <div className="h-4 bg-[#3d3d5280] rounded w-1/4"></div>
+        </div>
+      </div>
+      <div className="flex items-center space-x-3 p-2 bg-[#3d3d5280] animate-pulse rounded-md mt-2">
+        <div className="peer h-4 w-4 shrink-0 rounded-sm bg-[#3d3d5280]"></div>
+        <div className="peer-disabled:text-gray-500 peer-disabled:opacity-70 text-sm font-normal flex-grow">
+          <div className="h-4 bg-[#3d3d5280] rounded w-1/4"></div>
+        </div>
+      </div>
+      <div className="flex items-center space-x-3 p-2 bg-[#3d3d5280] animate-pulse rounded-md mt-2">
+        <div className="peer h-4 w-4 shrink-0 rounded-sm bg-[#3d3d5280]"></div>
+        <div className="peer-disabled:text-gray-500 peer-disabled:opacity-70 text-sm font-normal flex-grow">
+          <div className="h-4 bg-[#3d3d5280] rounded w-1/4"></div>
+        </div>
+      </div>
+      <div className="flex items-center space-x-3 p-2 bg-[#3d3d5280] animate-pulse rounded-md mt-2">
+        <div className="peer h-4 w-4 shrink-0 rounded-sm bg-[#3d3d5280]"></div>
+        <div className="peer-disabled:text-gray-500 peer-disabled:opacity-70 text-sm font-normal flex-grow">
+          <div className="h-4 bg-[#3d3d5280] rounded w-1/4"></div>
+        </div>
+      </div>
+    </div>
+  );
+};
+export interface BelongsToCollection {
+  id: number;
+  name: string;
+  poster_path: string;
+  backdrop_path: string;
+}
+
+export interface Genre {
+  id: number;
+  name: string;
+}
+
+export interface ProductionCompany {
+  id: number;
+  logo_path: string | null;
+  name: string;
+  origin_country: string;
+}
+
+export interface ProductionCountry {
+  iso_3166_1: string;
+  name: string;
+}
+
+export interface SpokenLanguage {
+  english_name: string;
+  iso_639_1: string;
+  name: string;
+}
+
+export interface Movie {
+  adult: boolean;
+  backdrop_path: string;
+  belongs_to_collection?: BelongsToCollection;
+  budget: number;
+  genres: Genre[];
+  homepage: string;
+  id: number;
+  imdb_id: string;
+  origin_country: string[];
+  original_language: string;
+  original_title: string;
+  overview: string;
+  popularity: number;
+  poster_path: string;
+  production_companies: ProductionCompany[];
+  production_countries: ProductionCountry[];
+  release_date: string;
+  revenue: number;
+  runtime: number;
+  spoken_languages: SpokenLanguage[];
+  status: string;
+  tagline: string;
+  title: string;
+  video: boolean;
+  vote_average: number;
+  vote_count: number;
+  userRating?: number | null;
+}

@@ -1,15 +1,16 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { getAllList } from "../../rtk-apis/getList";
 
-interface ListItem {
+export interface ListItem {
   id: string;
   name: string;
   userId: string;
   isPin: boolean;
+  items: [];
   createdAt: string;
   updatedAt: string;
 }
-interface ListState {
+export interface ListState {
   lists: ListItem[];
   status: "idle" | "loading" | "error";
   error: string | null;

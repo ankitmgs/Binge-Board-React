@@ -486,7 +486,7 @@ const MovieDetail = () => {
           </div>
         </div>
         {showModal && (
-          <AddMovieListModal onClose={() => setShowModal(false)} title={movieDetails?.title || movieDetails?.name} />
+          <AddMovieListModal onClose={() => setShowModal(false)} movieDetails={movieDetails} />
         )}
       </main>
     </div>
