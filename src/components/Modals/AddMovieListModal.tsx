@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../../redux/store";
 import { getAllList } from "../../redux/rtk-apis/getList";
 import { toast } from "react-toastify";
+import { addItemList } from "../../redux/rtk-apis/addItemList";
 
 interface AddMovieListModalProps {
   onClose?: () => void;
@@ -83,10 +84,14 @@ const AddMovieListModal: React.FC<AddMovieListModalProps> = ({
     }
     const newMovieDetails = { ...movieDetails, userRating: currentRating };
     const obj = {
-      selectedLists,
-      newMovieDetails,
+      itemIds: selectedLists,
+      movieDetail: newMovieDetails,
     };
-    console.log("Obj", obj);
+
+    dispatch(addItemList(obj)).then((res) => {
+      toast.success(res?.payload?.msg || "Item Added to list..");
+      onClose?.();
+    });
   };
 
   function handleClearRating() {
@@ -223,7 +228,7 @@ const AddMovieListModal: React.FC<AddMovieListModalProps> = ({
                 <button
                   type="button"
                   onClick={handleClearRating}
-                  className="ml-2 text-xs text-muted-foreground hover:text-foreground underline"
+                  className="ml-2 text-xs text-[#8585ad] hover:text-foreground underline"
                   title="Clear rating"
                 >
                   Clear
@@ -238,7 +243,12 @@ const AddMovieListModal: React.FC<AddMovieListModalProps> = ({
             </label>
             <div
               className="relative overflow-hidden max-h-48 mt-1 border rounded-md"
-              style={{ position: "relative" } as React.CSSProperties}
+              style={
+                {
+                  position: "relative",
+                  border: "1px solid #414158",
+                } as React.CSSProperties
+              }
             >
               <div
                 className="h-full w-full rounded-[inherit]"
@@ -252,6 +262,7 @@ const AddMovieListModal: React.FC<AddMovieListModalProps> = ({
                           _id: string;
                           name: string;
                           isPin: boolean;
+                          items: any;
                         }) => (
                           <div
                             key={list._id}
@@ -267,7 +278,7 @@ const AddMovieListModal: React.FC<AddMovieListModalProps> = ({
                                     : sel.filter((id) => id !== list._id)
                                 );
                               }}
-                              className="peer h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
+                              className="peer h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-[#9174e7] data-[state=checked]:text-black"
                               id={`list-checkbox-${list._id}`}
                             />
                             <label
@@ -275,8 +286,8 @@ const AddMovieListModal: React.FC<AddMovieListModalProps> = ({
                               className="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-sm font-normal flex-grow cursor-pointer"
                             >
                               {list.name}{" "}
-                              <span className="text-xs text-muted-foreground">
-                                (0 items)
+                              <span className="text-xs text-[#8585ad]">
+                                ({list?.items?.length} items)
                               </span>
                             </label>
                           </div>
@@ -291,20 +302,22 @@ const AddMovieListModal: React.FC<AddMovieListModalProps> = ({
         </div>
         <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 mt-2">
           <div className="flex w-full justify-between items-center">
-            <button className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 text-sm">
+            {/* <button className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 text-sm">
               <CirclePlusIcon className="mr-2 h-4 w-4" />
               Create New
-            </button>
+            </button> */}
+            <></>
             <div className="flex gap-2">
               <button
-                className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-[#181528] hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+                style={{ border: "1px solid #414158" }}
+                className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border-input bg-[#181528] hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
                 type="button"
                 onClick={onClose}
               >
                 Cancel
               </button>
               <button
-                className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
+                className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-[#9174e7] text-black hover:bg-[#9174e7]/90 h-10 px-4 py-2"
                 type="button"
                 onClick={() => handleSave()}
               >
@@ -315,7 +328,7 @@ const AddMovieListModal: React.FC<AddMovieListModalProps> = ({
         </div>
         <button
           type="button"
-          className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
+          className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-[#8585ad]"
           onClick={onClose}
         >
           <XIcon className="h-4 w-4" />
