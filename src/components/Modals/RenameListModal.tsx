@@ -47,7 +47,9 @@ export function RenameListDialog({
     await dispatch(
       editList({ listId: list._id, payload: { name: newListName } })
     ).then((res) => {
-      toast.success(res.payload || "Editing Success...");
+      console.log("res", res);
+      
+      toast.success(res.payload.msg || "Editing Success...");
       dispatch(getAllList());
     });
   };
