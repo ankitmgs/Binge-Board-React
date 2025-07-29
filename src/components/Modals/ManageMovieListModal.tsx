@@ -1,23 +1,17 @@
 import React, { useEffect, useRef, useState } from "react";
-import { CirclePlusIcon, XIcon } from "../../assets/icons";
-import { Star } from "lucide-react";
-import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../../redux/store";
+import { useDispatch, useSelector } from "react-redux";
 import { getAllList } from "../../redux/rtk-apis/getList";
-import { toast } from "react-toastify";
-import { addItemList } from "../../redux/rtk-apis/addItemList";
-import { getAllItemIDs } from "../../redux/rtk-apis/allItemIDs";
+import { ListSkeleton, type Movie } from "./AddMovieListModal";
+import { Star, XIcon } from "lucide-react";
 
-interface AddMovieListModalProps {
+interface ManageMovieListModalProps {
   onClose?: () => void;
   movieDetails?: Movie;
   disabled?: boolean;
 }
 
-const maxStars = 5;
-const starSize = "h-6 w-6";
-
-const AddMovieListModal: React.FC<AddMovieListModalProps> = ({
+const ManageMovieListModal: React.FC<ManageMovieListModalProps> = ({
   onClose,
   movieDetails,
   disabled = false,
@@ -68,38 +62,17 @@ const AddMovieListModal: React.FC<AddMovieListModalProps> = ({
     }
   }
 
-  const handleSave = () => {
-    if (!currentRating) {
-      toast.warn("Please add some rating...");
-      return;
-    }
-
-    if (!selectedLists || selectedLists.length === 0) {
-      toast.warn("Please select at least one list to add.");
-      return;
-    }
-
-    if (!movieDetails) {
-      console.error("Movie details not found.");
-      return;
-    }
-    const newMovieDetails = { ...movieDetails, userRating: currentRating };
-    const obj = {
-      itemIds: selectedLists,
-      movieDetail: newMovieDetails,
-    };
-
-    dispatch(addItemList(obj)).then((res) => {
-      toast.success(res?.payload?.msg || "Item Added to list..");
-      onClose?.();
-      dispatch(getAllItemIDs());
-    });
-  };
-
   function handleClearRating() {
     setCurrentRating(null);
     setHoverRating(null);
   }
+
+  const maxStars = 5;
+  const starSize = "h-6 w-6";
+
+  const handleUpdate = (item) => {
+    console.log("Items", item);
+  };
 
   return (
     <>
@@ -304,11 +277,6 @@ const AddMovieListModal: React.FC<AddMovieListModalProps> = ({
         </div>
         <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 mt-2">
           <div className="flex w-full justify-between items-center">
-            {/* <button className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 text-sm">
-              <CirclePlusIcon className="mr-2 h-4 w-4" />
-              Create New
-            </button> */}
-            <></>
             <div className="flex gap-2">
               <button
                 style={{ border: "1px solid #414158" }}
@@ -321,7 +289,7 @@ const AddMovieListModal: React.FC<AddMovieListModalProps> = ({
               <button
                 className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-[#9174e7] text-black hover:bg-[#9174e7]/90 h-10 px-4 py-2"
                 type="button"
-                onClick={() => handleSave()}
+                onClick={() => handleUpdate(item)}
               >
                 Save
               </button>
@@ -341,94 +309,4 @@ const AddMovieListModal: React.FC<AddMovieListModalProps> = ({
   );
 };
 
-export default AddMovieListModal;
-
-export const ListSkeleton = () => {
-  return (
-    <div>
-      <div className="flex items-center space-x-3 p-2 bg-[#3d3d5280] animate-pulse rounded-md">
-        <div className="peer h-4 w-4 shrink-0 rounded-sm bg-[#3d3d5280]"></div>
-        <div className="peer-disabled:text-gray-500 peer-disabled:opacity-70 text-sm font-normal flex-grow">
-          <div className="h-4 bg-[#3d3d5280] rounded w-1/4"></div>
-        </div>
-      </div>
-      <div className="flex items-center space-x-3 p-2 bg-[#3d3d5280] animate-pulse rounded-md mt-2">
-        <div className="peer h-4 w-4 shrink-0 rounded-sm bg-[#3d3d5280]"></div>
-        <div className="peer-disabled:text-gray-500 peer-disabled:opacity-70 text-sm font-normal flex-grow">
-          <div className="h-4 bg-[#3d3d5280] rounded w-1/4"></div>
-        </div>
-      </div>
-      <div className="flex items-center space-x-3 p-2 bg-[#3d3d5280] animate-pulse rounded-md mt-2">
-        <div className="peer h-4 w-4 shrink-0 rounded-sm bg-[#3d3d5280]"></div>
-        <div className="peer-disabled:text-gray-500 peer-disabled:opacity-70 text-sm font-normal flex-grow">
-          <div className="h-4 bg-[#3d3d5280] rounded w-1/4"></div>
-        </div>
-      </div>
-      <div className="flex items-center space-x-3 p-2 bg-[#3d3d5280] animate-pulse rounded-md mt-2">
-        <div className="peer h-4 w-4 shrink-0 rounded-sm bg-[#3d3d5280]"></div>
-        <div className="peer-disabled:text-gray-500 peer-disabled:opacity-70 text-sm font-normal flex-grow">
-          <div className="h-4 bg-[#3d3d5280] rounded w-1/4"></div>
-        </div>
-      </div>
-    </div>
-  );
-};
-export interface BelongsToCollection {
-  id: number;
-  name: string;
-  poster_path: string;
-  backdrop_path: string;
-}
-
-export interface Genre {
-  id: number;
-  name: string;
-}
-
-export interface ProductionCompany {
-  id: number;
-  logo_path: string | null;
-  name: string;
-  origin_country: string;
-}
-
-export interface ProductionCountry {
-  iso_3166_1: string;
-  name: string;
-}
-
-export interface SpokenLanguage {
-  english_name: string;
-  iso_639_1: string;
-  name: string;
-}
-
-export interface Movie {
-  adult: boolean;
-  backdrop_path: string;
-  belongs_to_collection?: BelongsToCollection;
-  budget: number;
-  genres: Genre[];
-  homepage: string;
-  id: number;
-  imdb_id: string;
-  origin_country: string[];
-  original_language: string;
-  original_title: string;
-  overview: string;
-  popularity: number;
-  poster_path: string;
-  production_companies: ProductionCompany[];
-  production_countries: ProductionCountry[];
-  release_date: string;
-  revenue: number;
-  runtime: number;
-  spoken_languages: SpokenLanguage[];
-  status: string;
-  tagline: string;
-  title: string;
-  video: boolean;
-  vote_average: number;
-  vote_count: number;
-  userRating?: number | null;
-}
+export default ManageMovieListModal;

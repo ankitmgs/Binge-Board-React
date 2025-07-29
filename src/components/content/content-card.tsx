@@ -1,9 +1,10 @@
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import type { RootState } from "../../redux/store";
-import { useEffect, useState } from "react";
+import type { AppDispatch, RootState } from "../../redux/store";
+import { useState } from "react";
 import { BookmarkPlus, CircleEllipsis } from "lucide-react";
 import AddMovieListModal from "../Modals/AddMovieListModal";
+import { openAddMovieListModal } from "../../redux/slices/modals/addMovieListModalSlice";
 
 interface ContentCardProps {
   item: any;
@@ -13,9 +14,12 @@ const ContentCard: React.FC<ContentCardProps> = ({ item }) => {
   const { IDs = [], isLoading } = useSelector(
     (state: RootState) => state.getAllItemIDs
   );
+  const dispatch = useDispatch<AppDispatch>();
   const [showAddToListModal, setShowAddToListModal] = useState<boolean>(false);
   const normalizedItemId = item?.id !== undefined ? Number(item.id) : null;
-  const isInDb = normalizedItemId !== null && IDs.includes(normalizedItemId);
+  const isInDb =
+    normalizedItemId !== null &&
+    IDs.map(String).includes(String(normalizedItemId));
 
   function formatDate(input: string): string {
     const date = new Date(input);
@@ -125,7 +129,7 @@ const ContentCard: React.FC<ContentCardProps> = ({ item }) => {
           <button
             className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 border-[#414158] border-input bg-[#181528] hover:bg-[#719df4] hover:text-black h-9 rounded-md px-3 w-full transition-all duration-200 ease-in-out cursor-pointer"
             aria-pressed="false"
-            onClick={() => setShowAddToListModal(true)}
+            onClick={() => dispatch(openAddMovieListModal(item))}
           >
             <BookmarkPlus className="mr-2 h-4 w-4" />
             Add to My List

@@ -6,6 +6,8 @@ import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../redux/store";
 import { getAllList } from "../redux/rtk-apis/getList";
 import { getAllItemIDs } from "../redux/rtk-apis/allItemIDs";
+import AddMovieListModal from "../components/Modals/AddMovieListModal";
+import { closeAddMovieListModal } from "../redux/slices/modals/addMovieListModalSlice";
 
 function Home() {
   const [item, setItem] = useState<any[]>([]);
@@ -13,6 +15,9 @@ function Home() {
   const dispatch = useDispatch<AppDispatch>();
   const { lists } = useSelector((state: RootState) => state.getAllList);
   const { IDs } = useSelector((state: RootState) => state.getAllItemIDs);
+  const { isOpen, movieDetails }: any = useSelector(
+    (state: RootState) => state.addMovieListModal
+  );
 
   useEffect(() => {
     if (!lists.length) {
@@ -46,6 +51,12 @@ function Home() {
       <HeroBanner items={item} loading={loading} />
 
       <HomeMoviesSection />
+      {isOpen && (
+        <AddMovieListModal
+          onClose={() => dispatch(closeAddMovieListModal())}
+          movieDetails={movieDetails}
+        />
+      )}
     </main>
   );
 }
