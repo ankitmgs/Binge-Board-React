@@ -5,6 +5,7 @@ import getAllLists from "./slices/lists/getAllListSlice";
 import deleteListSlice from "./slices/lists/deleteListSlice";
 import editListSlice from "./slices/lists/editListSlice";
 import addItemSlice from "./slices/lists/AddItemSlice";
+import getAllItemIDsSlice from "./slices/Items/getAllItemIdsSlice";
 
 export const store = configureStore({
   reducer: {
@@ -14,6 +15,7 @@ export const store = configureStore({
     deleteList: deleteListSlice,
     editList: editListSlice,
     addItem: addItemSlice,
+    getAllItemIDs: getAllItemIDsSlice,
   },
 });
 

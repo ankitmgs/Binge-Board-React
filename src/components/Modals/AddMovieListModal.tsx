@@ -6,6 +6,7 @@ import type { AppDispatch, RootState } from "../../redux/store";
 import { getAllList } from "../../redux/rtk-apis/getList";
 import { toast } from "react-toastify";
 import { addItemList } from "../../redux/rtk-apis/addItemList";
+import { getAllItemIDs } from "../../redux/rtk-apis/allItemIDs";
 
 interface AddMovieListModalProps {
   onClose?: () => void;
@@ -91,6 +92,7 @@ const AddMovieListModal: React.FC<AddMovieListModalProps> = ({
     dispatch(addItemList(obj)).then((res) => {
       toast.success(res?.payload?.msg || "Item Added to list..");
       onClose?.();
+      dispatch(getAllItemIDs());
     });
   };
 

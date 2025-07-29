@@ -1,26 +1,37 @@
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import type { RootState } from "../../redux/store";
+import { useEffect, useState } from "react";
+import { BookmarkPlus, CircleEllipsis } from "lucide-react";
+import AddMovieListModal from "../Modals/AddMovieListModal";
 
 interface ContentCardProps {
-  item: any; // Replace 'any' with a more specific type if available
+  item: any;
 }
 
 const ContentCard: React.FC<ContentCardProps> = ({ item }) => {
+  const { IDs = [], isLoading } = useSelector(
+    (state: RootState) => state.getAllItemIDs
+  );
+  const [showAddToListModal, setShowAddToListModal] = useState<boolean>(false);
+  const normalizedItemId = item?.id !== undefined ? Number(item.id) : null;
+  const isInDb = normalizedItemId !== null && IDs.includes(normalizedItemId);
 
   function formatDate(input: string): string {
-  const date = new Date(input);
-  if (isNaN(date.getTime())) {
-    return "Invalid date";
+    const date = new Date(input);
+    if (isNaN(date.getTime())) {
+      return "Invalid date";
+    }
+
+    const options: Intl.DateTimeFormatOptions = {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    };
+
+    return date.toLocaleDateString("en-US", options);
   }
 
-  const options: Intl.DateTimeFormatOptions = {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  };
-
-  return date.toLocaleDateString("en-US", options);
-}
-  
   return (
     <div className="rounded-lg border text-card-foreground w-44 sm:w-52 md:w-60 flex-shrink-0 overflow-hidden shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-primary/30 bg-[#262239] border-[#414158] group flex flex-col justify-between">
       <Link
@@ -96,36 +107,48 @@ const ContentCard: React.FC<ContentCardProps> = ({ item }) => {
               <path d="M12 18h.01"></path>
               <path d="M16 18h.01"></path>
             </svg>
-            <span>{formatDate(item?.release_date || item?.first_air_date)}</span>
+            <span>
+              {formatDate(item?.release_date || item?.first_air_date)}
+            </span>
           </div>
         </div>
       </Link>
       <div className="flex items-center p-3 pt-2 mt-auto">
-        <button
-          className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 border-[#414158] border-input bg-[#181528] hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3 w-full transition-all duration-200 ease-in-out"
-          aria-pressed="false"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="lucide lucide-bookmark-plus mr-2 h-4 w-4"
+        {isLoading ? (
+          <ButtonSkeleton />
+        ) : isInDb ? (
+          <button className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-[#9174e7] text-black hover:bg-[#9174e7]/90 h-9 rounded-md px-3 w-full transition-all duration-200 ease-in-out cursor-pointer">
+            <CircleEllipsis className="mr-2 h-4 w-4" />
+            Manage in Lists
+          </button>
+        ) : (
+          <button
+            className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 border-[#414158] border-input bg-[#181528] hover:bg-[#719df4] hover:text-black h-9 rounded-md px-3 w-full transition-all duration-200 ease-in-out cursor-pointer"
+            aria-pressed="false"
+            onClick={() => setShowAddToListModal(true)}
           >
-            <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"></path>
-            <line x1="12" x2="12" y1="7" y2="13"></line>
-            <line x1="15" x2="9" y1="10" y2="10"></line>
-          </svg>
-          Add to My List
-        </button>
+            <BookmarkPlus className="mr-2 h-4 w-4" />
+            Add to My List
+          </button>
+        )}
       </div>
+      {showAddToListModal && (
+        <AddMovieListModal
+          onClose={() => setShowAddToListModal(false)}
+          movieDetails={item}
+        />
+      )}
     </div>
   );
 };
 
 export default ContentCard;
+
+const ButtonSkeleton = () => {
+  return (
+    <button
+      className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 border-[#414158] border-input bg-[#181528] hover:bg-[#719df4] hover:text-accent-foreground h-9 rounded-md px-3 w-full transition-all duration-200 ease-in-out animate-pulse"
+      aria-pressed="false"
+    ></button>
+  );
+};

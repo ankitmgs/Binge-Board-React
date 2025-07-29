@@ -2,17 +2,25 @@ import { useEffect, useState } from "react";
 import { HeroBanner } from "../components/banner/HeroBanner";
 import HomeMoviesSection from "../components/homeMovies";
 import { getNowPlayingMovies } from "../services/tmdb";
-import { useDispatch } from "react-redux";
-import type { AppDispatch } from "../redux/store";
+import { useDispatch, useSelector } from "react-redux";
+import type { AppDispatch, RootState } from "../redux/store";
 import { getAllList } from "../redux/rtk-apis/getList";
+import { getAllItemIDs } from "../redux/rtk-apis/allItemIDs";
 
 function Home() {
   const [item, setItem] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const dispatch = useDispatch<AppDispatch>();
-  
+  const { lists } = useSelector((state: RootState) => state.getAllList);
+  const { IDs } = useSelector((state: RootState) => state.getAllItemIDs);
+
   useEffect(() => {
-    dispatch(getAllList());
+    if (!lists.length) {
+      dispatch(getAllList());
+    }
+    if (!IDs.length) {
+      dispatch(getAllItemIDs());
+    }
     getNowPlayingMovies().then((data) => {
       if (Array.isArray(data)) {
         setItem(data);
