@@ -7,6 +7,7 @@ import editListSlice from "./slices/lists/editListSlice";
 import addItemSlice from "./slices/lists/addItemSlice";
 import getAllItemIDsSlice from "./slices/Items/getAllItemIdsSlice";
 import addMovieListModalSlice from "./slices/modals/addMovieListModalSlice";
+import manageMovieListModalSlice from "./slices/modals/manageMovieListModalSlice";
 
 export const store = configureStore({
   reducer: {
@@ -18,6 +19,7 @@ export const store = configureStore({
     addItem: addItemSlice,
     getAllItemIDs: getAllItemIDsSlice,
     addMovieListModal: addMovieListModalSlice,
+    manageMovieListModalList: manageMovieListModalSlice,
   },
 });
 

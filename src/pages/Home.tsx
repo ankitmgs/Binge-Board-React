@@ -6,8 +6,16 @@ import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../redux/store";
 import { getAllList } from "../redux/rtk-apis/getList";
 import { getAllItemIDs } from "../redux/rtk-apis/allItemIDs";
-import AddMovieListModal from "../components/Modals/AddMovieListModal";
-import { closeAddMovieListModal } from "../redux/slices/modals/addMovieListModalSlice";
+import AddMovieListModal, {
+  type Movie,
+} from "../components/Modals/AddMovieListModal";
+import {
+  closeAddMovieListModal,
+  type AddMovieListModalState,
+  type MovieDetails,
+} from "../redux/slices/modals/addMovieListModalSlice";
+import ManageMovieListModal from "../components/Modals/ManageMovieListModal";
+import { closeManageMovieListModal } from "../redux/slices/modals/manageMovieListModalSlice";
 
 function Home() {
   const [item, setItem] = useState<any[]>([]);
@@ -18,7 +26,8 @@ function Home() {
   const { isOpen, movieDetails }: any = useSelector(
     (state: RootState) => state.addMovieListModal
   );
-
+  const { isOpen: isManageModalOpen, movieDetails: manageMovieDetails }: any =
+    useSelector((state: RootState) => state.manageMovieListModalList);
   useEffect(() => {
     if (!lists.length) {
       dispatch(getAllList());
@@ -55,6 +64,12 @@ function Home() {
         <AddMovieListModal
           onClose={() => dispatch(closeAddMovieListModal())}
           movieDetails={movieDetails}
+        />
+      )}
+      {isManageModalOpen && (
+        <ManageMovieListModal
+          onClose={() => dispatch(closeManageMovieListModal())}
+          movieDetails={manageMovieDetails}
         />
       )}
     </main>

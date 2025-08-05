@@ -5,6 +5,7 @@ import { useState } from "react";
 import { BookmarkPlus, CircleEllipsis } from "lucide-react";
 import AddMovieListModal from "../Modals/AddMovieListModal";
 import { openAddMovieListModal } from "../../redux/slices/modals/addMovieListModalSlice";
+import { openManageMovieListModal } from "../../redux/slices/modals/manageMovieListModalSlice";
 
 interface ContentCardProps {
   item: any;
@@ -121,7 +122,10 @@ const ContentCard: React.FC<ContentCardProps> = ({ item }) => {
         {isLoading ? (
           <ButtonSkeleton />
         ) : isInDb ? (
-          <button className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-[#9174e7] text-black hover:bg-[#9174e7]/90 h-9 rounded-md px-3 w-full transition-all duration-200 ease-in-out cursor-pointer">
+          <button
+            className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-[#9174e7] text-black hover:bg-[#9174e7]/90 h-9 rounded-md px-3 w-full transition-all duration-200 ease-in-out cursor-pointer"
+            onClick={() => dispatch(openManageMovieListModal(item))}
+          >
             <CircleEllipsis className="mr-2 h-4 w-4" />
             Manage in Lists
           </button>

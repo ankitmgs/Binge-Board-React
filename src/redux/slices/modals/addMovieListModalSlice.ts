@@ -1,18 +1,9 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-
-export interface MovieDetails {
-  id: number;
-  title?: string;
-  name?: string;
-  poster_path?: string;
-  backdrop_path?: string;
-  media_type?: string;
-  // Add other movie details properties as needed
-}
+import type { Movie } from '../../../components/Modals/AddMovieListModal';
 
 export interface AddMovieListModalState {
   isOpen: boolean;
-  movieDetails: MovieDetails | null;
+  movieDetails: Movie | null;
 }
 
 const initialState: AddMovieListModalState = {
@@ -24,7 +15,7 @@ const addMovieListModalSlice = createSlice({
   name: 'addMovieListModal',
   initialState,
   reducers: {
-    openAddMovieListModal: (state, action: PayloadAction<MovieDetails>) => {
+    openAddMovieListModal: (state, action: PayloadAction<Movie>) => {
       state.isOpen = true;
       state.movieDetails = action.payload;
     },
